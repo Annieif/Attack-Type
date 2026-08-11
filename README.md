@@ -29,8 +29,8 @@ Minecraft Fabric 1.20.1 模组，实现「攻击类型」和「罪孽属性」�
 - **溢出阈值 500**：碎片 ≥500 时该类型图标显示"溢"，下一次该罪孽攻击自动触发（优先对应附魔类型）
 - **即死阈值 1000**：碎片 ≥1000 时显示"死"，直接秒杀攻击者（自反）
 - **手动触发**：按 `\` 键消耗碎片触发当前激活罪孽，消耗由等级决定：
-  - Lv.1：100 碎片；Lv.2：200 碎片；Lv.3：300 碎片
-  - 武器拥有对应罪孽附魔时：每 1 附魔级减少 10% 消耗
+  - Lv.1：40 碎片；Lv.2：70 碎片；Lv.3：100 碎片
+  - 武器拥有对应罪孽附魔时：每 1 附魔级减少 2 点消耗（最低 1）
 - **激活罪孽切换**：按 `[` / `]` 键切换当前激活的罪孽类型（HUD 图标高亮）
 
 #### 其他生物（随机 + 附魔加成）
@@ -142,9 +142,9 @@ src/
 │   │   ├── PhysicalResistanceEnchantment.java
 │   │   └── SinEnchantment.java
 │   ├── fragment/
-│   │   ├── SinFragmentData.java            # 7种碎片计数 + 激活罪孽 (L1/L2/L3)
+│   │   ├── SinFragmentData.java            # 7种碎片计数 + 消耗常量(40/70/100) + 激活罪孽 (L1/L2/L3)
 │   │   ├── SinFragmentManager.java         # 碎片增删、触发、溢出即死判定
-│   │   └── SinFragmentConfig.java          # 配置：触发消耗 L1/L2/L3 + 持续
+│   │   └── SinFragmentConfig.java          # 自动触发配置（预留，暂未启用）
 │   ├── mixin/MixinLivingEntity.java        # damage HEAD / applyDamage ModifyArg
 │   ├── command/ResistanceCommand.java      # /attacktype get|set|reset|tick|fragment
 │   └── network/
@@ -237,7 +237,7 @@ long activeSinExpiryTicks;    // 激活持续时间（L1最长，L3最短）
 | 500 | OVERFLOW 溢出 | 下次对应罪孽攻击自动触发消耗（扣对应等级），HUD 显示"溢" |
 | 1000 | KILL 即死 | 直接 `player.kill()`，HUD 显示"死" |
 
-消耗公式：`cost(level, enchantLv) = ceil( baseCost(level) × (1 - 0.1×enchantLv) )`
+消耗公式：`cost(level, enchantLv) = max(1, baseCost(level) - 2 × enchantLv)` ，其中 baseCost 为 L1=40, L2=70, L3=100
 
 ### 5. MixinLivingEntity — 伤害计算注入
 

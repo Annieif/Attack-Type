@@ -98,4 +98,16 @@
 ### 阶段26: README 更新与 Git 提交（完成）
 - README 重写：新增玩家罪孽碎片系统（HUD/阈值500溢/1000死/[ ] \键位）、其他生物随机罪孽（5%+10%/lv）、完整键位表、碎片指令、fragment 包与网络包、单列 UI 修复、i18n 说明
 - 构建: **BUILD SUCCESSFUL**
-- 待 Git commit
+- Commit `8f39e33`: Update README (fragment system, mob sin rules, key map, commands, i18n, UI, architecture) — 3 files changed, +189 -248
+
+### 阶段27: 项目全面审查与优化（完成）
+- 全面审查23个Java文件 + 配置文件 + README
+- 修复6个问题：
+  1. 删除 zh_cn.json / en_us.json 中无效条目 `attack_type.attack_type.fierce`（无对应枚举）
+  2. 修正 README 手动触发消耗：100/200/300 → 40/70/100
+  3. 修正 README 附魔减耗：10% → 每级 -2
+  4. 修复 HUD L1/L2/L3 标签不消失：添加 `worldTime < expiry` 过期检查
+  5. 修复 ResistanceScreen 溢出提示被 TextFieldWidget 覆盖：移到 super.render() 之后
+  6. 标记 SinFragmentConfig 为预留代码（未被任何代码引用）
+- 一致性验证：枚举↔语言文件✓ 伤害公式✓ 网络包✓ 附魔等级✓ 配置文件✓
+- 构建: **BUILD SUCCESSFUL**

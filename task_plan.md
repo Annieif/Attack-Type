@@ -34,6 +34,29 @@
 | 24 | ResistanceScreen UI 修复 | ✅ completed    | 单列布局、删除输入框阴影、数值越界提示、修复标签错位 |
 | 25 | 其他生物罪孽触发 | ✅ completed | 非玩家生物: 5%基础随机触发(等级1~3)+附魔类型&等级加成 |
 | 26 | README 更新与 Git 提交 | ✅ completed | 文档：碎片系统+键位+指令+怪物随机触发，提交 commit |
+| 27 | 项目全面审查与优化 | ✅ completed | 修复6个问题：语言文件无效条目、README数值不一致、HUD L标签不消失、溢出提示渲染、死代码标记 |
+
+## 阶段27 — 项目全面审查与优化
+
+**审查范围：** 23个Java文件 + 配置文件 + README
+
+**发现并修复的问题：**
+
+| # | 问题 | 文件 | 修复 |
+|---|------|------|------|
+| 1 | `attack_type.attack_type.fierce` 无效条目（无对应枚举） | zh_cn.json, en_us.json | 删除 |
+| 2 | README 手动触发消耗写错：100/200/300 → 实际 40/70/100 | README.md | 修正 |
+| 3 | README 附魔减耗写错：10% → 实际 -2/级 | README.md | 修正 |
+| 4 | HUD L1/L2/L3 标签不消失（客户端不检查过期时间） | SinFragmentHUD.java | 添加 worldTime < expiry 检查 |
+| 5 | ResistanceScreen 溢出提示被 TextFieldWidget 覆盖 | ResistanceScreen.java | 溢出提示移到 super.render() 之后 |
+| 6 | SinFragmentConfig 未被任何代码引用（死代码） | README.md | 标记为"预留，暂未启用" |
+
+**一致性验证通过项：**
+- AttackType 3种类型 + SinType 7种类型，枚举与语言文件一一对应 ✓
+- 伤害公式：代码与 README 一致 ✓
+- 网络包：客户端/服务端同步逻辑完整 ✓
+- 附魔等级范围：SinEnchantment max=5, PhysicalResistance max=4 ✓
+- 配置文件：fabric.mod.json, build.gradle 一致 ✓
 
 ## 伤害公式
 

@@ -25,8 +25,8 @@ public class ResistanceScreen extends Screen {
     private static final int FIELD_W = 72;
     private static final int FIELD_H = 18;
     private static final int LABEL_W = 64;
-    private static final int ROW_H = 22;
-    private static final int SECTION_GAP = 14;
+    private static final int ROW_H = 18;
+    private static final int SECTION_GAP = 8;
     private static final float CLAMP_MAX = 5.0f;
 
     public ResistanceScreen() {
@@ -40,7 +40,7 @@ public class ResistanceScreen extends Screen {
     protected void init() {
         super.init();
         int centerX = width / 2;
-        int y = 30;
+        int y = 24;
 
         int totalHalf = (LABEL_W + 8 + FIELD_W + 8 + 48) / 2;
         int labelX = centerX - totalHalf;
@@ -140,7 +140,7 @@ public class ResistanceScreen extends Screen {
         renderBackground(context);
 
         int centerX = width / 2;
-        int y = 30;
+        int y = 24;
 
         int totalHalf = (LABEL_W + 8 + FIELD_W + 8 + 48) / 2;
         int labelX = centerX - totalHalf;
@@ -151,6 +151,13 @@ public class ResistanceScreen extends Screen {
 
         double product = 1.0;
         AttackType[] atypes = getAttackTypes();
+        SinType[] stypes = SinType.values();
+
+        int totalRows = atypes.length + stypes.length;
+        boolean[] overflows = new boolean[totalRows];
+        float[] rawValues = new float[totalRows];
+        int[] lyTexts = new int[totalRows];
+
         for (int i = 0; i < atypes.length; i++) {
             int ly = y + i * ROW_H;
             TextFieldWidget tf = physicalFields.get(i);
@@ -158,49 +165,45 @@ public class ResistanceScreen extends Screen {
             float v = profile.getPhysicalResistance(atypes[i]);
             product *= v;
             boolean overflow = !Float.isNaN(raw) && (raw < 0f || raw > CLAMP_MAX);
+            overflows[i] = overflow;
+            rawValues[i] = raw;
 
             drawFieldBorder(context, tf, overflow);
 
             Text label = Text.translatable("attack_type.attack_type." + atypes[i].name().toLowerCase());
             int lyText = ly + (FIELD_H - 8) / 2;
+            lyTexts[i] = lyText;
             context.drawTextWithShadow(textRenderer, label, labelX, lyText, 0xCCCCCC);
 
             Text status = Text.translatable(v >= 1.0f ? "screen.attack_type.vulnerable" : "screen.attack_type.resist");
             context.drawTextWithShadow(textRenderer, status, statusX, lyText,
                     v >= 1.0f ? 0xFF8888 : 0x88FF88);
-
-            if (overflow) {
-                Text ovText = Text.literal(raw > CLAMP_MAX ? ">" : "<");
-                context.drawTextWithShadow(textRenderer, ovText, statusX + 42, lyText, 0xFFFF4444);
-            }
         }
 
         y += atypes.length * ROW_H + SECTION_GAP;
         int sinStartY = y;
 
-        SinType[] stypes = SinType.values();
         for (int i = 0; i < stypes.length; i++) {
+            int idx = atypes.length + i;
             int ly = y + i * ROW_H;
             TextFieldWidget tf = sinFields.get(i);
             float raw = tryParse(tf.getText());
             float v = profile.getSinResistance(stypes[i]);
             product *= v;
             boolean overflow = !Float.isNaN(raw) && (raw < 0f || raw > CLAMP_MAX);
+            overflows[idx] = overflow;
+            rawValues[idx] = raw;
 
             drawFieldBorder(context, tf, overflow);
 
             Text label = Text.translatable("sin.attack_type." + stypes[i].name().toLowerCase());
             int lyText = ly + (FIELD_H - 8) / 2;
+            lyTexts[idx] = lyText;
             context.drawTextWithShadow(textRenderer, label, labelX, lyText, 0xCCCCCC);
 
             Text status = Text.translatable(v >= 1.0f ? "screen.attack_type.vulnerable" : "screen.attack_type.resist");
             context.drawTextWithShadow(textRenderer, status, statusX, lyText,
                     v >= 1.0f ? 0xFF8888 : 0x88FF88);
-
-            if (overflow) {
-                Text ovText = Text.literal(raw > CLAMP_MAX ? ">" : "<");
-                context.drawTextWithShadow(textRenderer, ovText, statusX + 42, lyText, 0xFFFF4444);
-            }
         }
 
         y = sinStartY + stypes.length * ROW_H + SECTION_GAP - 4;
@@ -213,6 +216,16 @@ public class ResistanceScreen extends Screen {
                 centerX - tw / 2, y, ok ? 0x66FF66 : 0xFF6666);
 
         super.render(context, mouseX, mouseY, delta);
+
+        for (int i = 0; i < totalRows; i++) {
+            if (overflows[i]) {
+                float raw = rawValues[i];
+                Text ovText = Text.literal(raw > CLAMP_MAX ? ">" : "<");
+                Text stText = Text.translatable("screen.attack_type.vulnerable");
+                int stW = textRenderer.getWidth(stText);
+                context.drawTextWithShadow(textRenderer, ovText, statusX + stW + 2, lyTexts[i], 0xFFFF4444);
+            }
+        }
     }
 
     @Override

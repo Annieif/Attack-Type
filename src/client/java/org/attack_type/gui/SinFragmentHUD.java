@@ -34,6 +34,9 @@ public class SinFragmentHUD {
         SinType[] types = SinType.values();
         SinType selected = ClientFragmentCache.getActiveSinType();
         int selectedLevel = ClientFragmentCache.getActiveSinLevel();
+        long worldTime = client.world != null ? client.world.getTime() : 0;
+        long expiry = ClientFragmentCache.getActiveSinExpiry();
+        boolean sinActive = selectedLevel > 0 && worldTime < expiry;
 
         int x = 4;
         int y = 4;
@@ -80,7 +83,7 @@ public class SinFragmentHUD {
             context.fill(tx - 1, ty - 1, tx + tw + 1, ty + 9, 0x55000000);
             context.drawTextWithShadow(client.textRenderer, countText, tx, ty, textColor);
 
-            if (isSelected && selectedLevel > 0) {
+            if (isSelected && sinActive) {
                 String lv = "L" + selectedLevel;
                 int tw2 = client.textRenderer.getWidth(lv);
                 int tx2 = cellX + ICON_SIZE - tw2 - 1;
