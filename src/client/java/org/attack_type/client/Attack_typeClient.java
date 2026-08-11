@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import org.attack_type.api.SinType;
 import org.attack_type.fragment.ClientFragmentCache;
@@ -115,8 +116,9 @@ public class Attack_typeClient implements ClientModInitializer {
     private static void showCycleMessage() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
+            Text sinName = Text.translatable("sin.attack_type." + ClientFragmentCache.getActiveSinType().name().toLowerCase());
             client.player.sendMessage(
-                    net.minecraft.text.Text.literal("Active Sin: " + ClientFragmentCache.getActiveSinType().name()),
+                    Text.translatable("hud.attack_type.active_sin", sinName),
                     true
             );
         }

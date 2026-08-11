@@ -23,12 +23,14 @@ public class ResistanceScreen extends Screen {
     private final List<TextFieldWidget> sinFields = new ArrayList<>();
 
     private static final int FIELD_W = 72;
+    private static final int FIELD_H = 18;
+    private static final int LABEL_W = 64;
     private static final int ROW_H = 22;
-    private static final int COL_GAP = 16;
     private static final int SECTION_GAP = 14;
+    private static final float CLAMP_MAX = 5.0f;
 
     public ResistanceScreen() {
-        super(Text.literal("Resistance Allocation"));
+        super(Text.translatable("screen.attack_type.resistance"));
         this.profile = new ResistanceProfile();
         ResistanceProfile cached = ClientResistanceCache.getProfile();
         if (cached != null) copyProfile(cached, this.profile);
@@ -38,23 +40,22 @@ public class ResistanceScreen extends Screen {
     protected void init() {
         super.init();
         int centerX = width / 2;
-        int y = 28;
+        int y = 30;
 
-        int col2FieldX = centerX + COL_GAP / 2;
-        int col1FieldX = centerX - COL_GAP / 2 - FIELD_W;
+        int totalHalf = (LABEL_W + 8 + FIELD_W + 8 + 48) / 2;
+        int labelX = centerX - totalHalf;
+        int fieldX = labelX + LABEL_W + 8;
 
         AttackType[] atypes = getAttackTypes();
         SinType[] stypes = SinType.values();
-        int rows1 = (atypes.length + 1) / 2;
-        int rows2 = (stypes.length + 1) / 2;
+        int rows1 = atypes.length;
+        int rows2 = stypes.length;
 
         for (int i = 0; i < atypes.length; i++) {
-            int col = i % 2;
-            int row = i / 2;
-            int fx = col == 0 ? col1FieldX : col2FieldX;
-            int fy = y + row * ROW_H;
-            TextFieldWidget tf = new TextFieldWidget(textRenderer, fx, fy, FIELD_W, 18,
+            int fy = y + i * ROW_H;
+            TextFieldWidget tf = new TextFieldWidget(textRenderer, fieldX, fy, FIELD_W, FIELD_H,
                     Text.literal(atypes[i].name()));
+            tf.setDrawsBackground(false);
             tf.setText(String.format("%.2f", profile.getPhysicalResistance(atypes[i])));
             addDrawableChild(tf);
             physicalFields.add(tf);
@@ -64,19 +65,17 @@ public class ResistanceScreen extends Screen {
         int sinStartY = y;
 
         for (int i = 0; i < stypes.length; i++) {
-            int col = i % 2;
-            int row = i / 2;
-            int fx = col == 0 ? col1FieldX : col2FieldX;
-            int fy = y + row * ROW_H;
-            TextFieldWidget tf = new TextFieldWidget(textRenderer, fx, fy, FIELD_W, 18,
+            int fy = y + i * ROW_H;
+            TextFieldWidget tf = new TextFieldWidget(textRenderer, fieldX, fy, FIELD_W, FIELD_H,
                     Text.literal(stypes[i].name()));
+            tf.setDrawsBackground(false);
             tf.setText(String.format("%.2f", profile.getSinResistance(stypes[i])));
             addDrawableChild(tf);
             sinFields.add(tf);
         }
 
         y = sinStartY + rows2 * ROW_H + SECTION_GAP;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Apply"), b -> applyChanges())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("screen.attack_type.apply"), b -> applyChanges())
                 .dimensions(centerX - 50, y, 100, 20).build());
     }
 
@@ -87,7 +86,7 @@ public class ResistanceScreen extends Screen {
 
     private float clamp(float v) {
         if (v < 0f) return 0f;
-        if (v > 5f) return 5f;
+        if (v > CLAMP_MAX) return CLAMP_MAX;
         return Math.round(v * 100f) / 100f;
     }
 
@@ -120,76 +119,97 @@ public class ResistanceScreen extends Screen {
         close();
     }
 
+    private static float tryParse(String s) {
+        try { return Float.parseFloat(s); }
+        catch (NumberFormatException e) { return Float.NaN; }
+    }
+
+    private void drawFieldBorder(DrawContext ctx, TextFieldWidget tf, boolean overflow) {
+        int x = tf.getX();
+        int y = tf.getY();
+        int w = tf.getWidth();
+        int h = tf.getHeight();
+        int border = overflow ? 0xFFFF5555 : 0xFF888888;
+        ctx.fill(x - 1, y - 1, x + w + 1, y + h + 1, border);
+        ctx.fill(x, y, x + w, y + h, 0xFF111111);
+    }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         collectInputs();
         renderBackground(context);
 
         int centerX = width / 2;
-        int y = 28;
-        int col2FieldX = centerX + COL_GAP / 2;
-        int col1FieldX = centerX - COL_GAP / 2 - FIELD_W;
-        int col1LabelX = col1FieldX - 42;
-        int col2LabelX = col2FieldX - 42;
-        int status1X = col1FieldX + FIELD_W + 4;
-        int status2X = col2FieldX + FIELD_W + 4;
+        int y = 30;
+
+        int totalHalf = (LABEL_W + 8 + FIELD_W + 8 + 48) / 2;
+        int labelX = centerX - totalHalf;
+        int fieldX = labelX + LABEL_W + 8;
+        int statusX = fieldX + FIELD_W + 8;
 
         context.drawCenteredTextWithShadow(textRenderer, title, centerX, 8, 0xFFFFFF);
 
         double product = 1.0;
         AttackType[] atypes = getAttackTypes();
         for (int i = 0; i < atypes.length; i++) {
-            int col = i % 2;
-            int row = i / 2;
-            int ly = y + row * ROW_H + 5;
+            int ly = y + i * ROW_H;
+            TextFieldWidget tf = physicalFields.get(i);
+            float raw = tryParse(tf.getText());
             float v = profile.getPhysicalResistance(atypes[i]);
             product *= v;
-            String label = Text.translatable("attack_type.attack_type." + atypes[i].name().toLowerCase()).getString();
-            if (col == 0) {
-                context.drawTextWithShadow(textRenderer, Text.literal(label), col1LabelX, ly, 0xCCCCCC);
-                context.drawTextWithShadow(textRenderer,
-                        Text.literal(v >= 1.0f ? "脆弱" : "耐性"), status1X, ly,
-                        v >= 1.0f ? 0xFF8888 : 0x88FF88);
-            } else {
-                context.drawTextWithShadow(textRenderer, Text.literal(label), col2LabelX, ly, 0xCCCCCC);
-                context.drawTextWithShadow(textRenderer,
-                        Text.literal(v >= 1.0f ? "脆弱" : "耐性"), status2X, ly,
-                        v >= 1.0f ? 0xFF8888 : 0x88FF88);
+            boolean overflow = !Float.isNaN(raw) && (raw < 0f || raw > CLAMP_MAX);
+
+            drawFieldBorder(context, tf, overflow);
+
+            Text label = Text.translatable("attack_type.attack_type." + atypes[i].name().toLowerCase());
+            int lyText = ly + (FIELD_H - 8) / 2;
+            context.drawTextWithShadow(textRenderer, label, labelX, lyText, 0xCCCCCC);
+
+            Text status = Text.translatable(v >= 1.0f ? "screen.attack_type.vulnerable" : "screen.attack_type.resist");
+            context.drawTextWithShadow(textRenderer, status, statusX, lyText,
+                    v >= 1.0f ? 0xFF8888 : 0x88FF88);
+
+            if (overflow) {
+                Text ovText = Text.literal(raw > CLAMP_MAX ? ">" : "<");
+                context.drawTextWithShadow(textRenderer, ovText, statusX + 42, lyText, 0xFFFF4444);
             }
         }
 
-        int rows1 = (atypes.length + 1) / 2;
-        y += rows1 * ROW_H + SECTION_GAP;
+        y += atypes.length * ROW_H + SECTION_GAP;
         int sinStartY = y;
 
         SinType[] stypes = SinType.values();
         for (int i = 0; i < stypes.length; i++) {
-            int col = i % 2;
-            int row = i / 2;
-            int ly = y + row * ROW_H + 5;
+            int ly = y + i * ROW_H;
+            TextFieldWidget tf = sinFields.get(i);
+            float raw = tryParse(tf.getText());
             float v = profile.getSinResistance(stypes[i]);
             product *= v;
-            String label = Text.translatable("sin.attack_type." + stypes[i].name().toLowerCase()).getString();
-            if (col == 0) {
-                context.drawTextWithShadow(textRenderer, Text.literal(label), col1LabelX, ly, 0xCCCCCC);
-                context.drawTextWithShadow(textRenderer,
-                        Text.literal(v >= 1.0f ? "脆弱" : "耐性"), status1X, ly,
-                        v >= 1.0f ? 0xFF8888 : 0x88FF88);
-            } else {
-                context.drawTextWithShadow(textRenderer, Text.literal(label), col2LabelX, ly, 0xCCCCCC);
-                context.drawTextWithShadow(textRenderer,
-                        Text.literal(v >= 1.0f ? "脆弱" : "耐性"), status2X, ly,
-                        v >= 1.0f ? 0xFF8888 : 0x88FF88);
+            boolean overflow = !Float.isNaN(raw) && (raw < 0f || raw > CLAMP_MAX);
+
+            drawFieldBorder(context, tf, overflow);
+
+            Text label = Text.translatable("sin.attack_type." + stypes[i].name().toLowerCase());
+            int lyText = ly + (FIELD_H - 8) / 2;
+            context.drawTextWithShadow(textRenderer, label, labelX, lyText, 0xCCCCCC);
+
+            Text status = Text.translatable(v >= 1.0f ? "screen.attack_type.vulnerable" : "screen.attack_type.resist");
+            context.drawTextWithShadow(textRenderer, status, statusX, lyText,
+                    v >= 1.0f ? 0xFF8888 : 0x88FF88);
+
+            if (overflow) {
+                Text ovText = Text.literal(raw > CLAMP_MAX ? ">" : "<");
+                context.drawTextWithShadow(textRenderer, ovText, statusX + 42, lyText, 0xFFFF4444);
             }
         }
 
-        int rows2 = (stypes.length + 1) / 2;
-        y = sinStartY + rows2 * ROW_H + SECTION_GAP - 4;
+        y = sinStartY + stypes.length * ROW_H + SECTION_GAP - 4;
 
         boolean ok = product >= 1.0;
-        String prodStr = String.format("Total Product: %.4f   %s", product, ok ? "✓ OK" : "✗ <1");
-        int tw = textRenderer.getWidth(prodStr);
-        context.drawTextWithShadow(textRenderer, Text.literal(prodStr),
+        Text status = Text.translatable(ok ? "screen.attack_type.ok" : "screen.attack_type.lt1");
+        Text prodText = Text.translatable("screen.attack_type.total_product_line", product, status);
+        int tw = textRenderer.getWidth(prodText);
+        context.drawTextWithShadow(textRenderer, prodText,
                 centerX - tw / 2, y, ok ? 0x66FF66 : 0xFF6666);
 
         super.render(context, mouseX, mouseY, delta);

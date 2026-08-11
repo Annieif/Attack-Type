@@ -171,19 +171,19 @@ public class ResistanceProfile {
 
     public String getResistanceLabel(AttackType type) {
         float value = getPhysicalResistance(type);
-        if (value > 1.5f) return "致命";
-        if (value > 1.0f) return "脆弱";
-        if (value == 1.0f) return "一般";
-        if (value > 0.5f) return "耐性";
-        return "抵抗";
+        if (value > 1.5f) return "Fatal";
+        if (value > 1.0f) return "Vuln";
+        if (value == 1.0f) return "Normal";
+        if (value > 0.5f) return "Tough";
+        return "Resist";
     }
 
     public String getResistanceLabel(SinType type) {
         float value = getSinResistance(type);
-        if (value > 1.5f) return "致命";
-        if (value > 1.0f) return "脆弱";
-        if (value == 1.0f) return "一般";
-        if (value > 0.5f) return "耐性";
-        return "抵抗";
+        if (value > 1.5f) return "Fatal";
+        if (value > 1.0f) return "Vuln";
+        if (value == 1.0f) return "Normal";
+        if (value > 0.5f) return "Tough";
+        return "Resist";
     }
 }

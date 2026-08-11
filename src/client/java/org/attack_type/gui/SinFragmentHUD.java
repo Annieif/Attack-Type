@@ -2,6 +2,7 @@ package org.attack_type.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.attack_type.Attack_type;
 import org.attack_type.api.SinType;
@@ -63,10 +64,10 @@ public class SinFragmentHUD {
             String countText;
             int textColor;
             if (count >= 1000) {
-                countText = "死";
+                countText = Text.translatable("hud.attack_type.death_char").getString();
                 textColor = 0xFF6666;
             } else if (count >= 500) {
-                countText = "溢";
+                countText = Text.translatable("hud.attack_type.overflow_char").getString();
                 textColor = 0xFFBB44;
             } else if (count == 0) {
                 countText = "0";

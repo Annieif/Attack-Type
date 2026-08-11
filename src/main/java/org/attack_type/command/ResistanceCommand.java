@@ -99,26 +99,24 @@ public class ResistanceCommand {
 
     private static int getResistance(CommandContext<ServerCommandSource> ctx, net.minecraft.entity.Entity entity) {
         if (!(entity instanceof LivingEntity living)) {
-            ctx.getSource().sendError(Text.literal("Target must be a living entity"));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_not_living"));
             return 0;
         }
 
         ResistanceProfile profile = ResistanceManager.getOrCreateProfile(living);
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(entity.getName().getString()).append(" ===\n");
-        sb.append("Total Product: ").append(String.format("%.2f", profile.getTotalProduct())).append("\n");
-        sb.append("Physical:\n");
+        sb.append(t("cmd.attack_type.get_title", entity.getName().getString())).append("\n");
+        sb.append(t("cmd.attack_type.total_product", profile.getTotalProduct())).append("\n");
+        sb.append(t("cmd.attack_type.physical_title")).append("\n");
         for (AttackType type : AttackType.values()) {
             if (type == AttackType.NONE) continue;
             float v = profile.getPhysicalResistance(type);
-            sb.append("  ").append(type.name()).append(": ").append(String.format("%.2f", v))
-                    .append(" (").append(profile.getResistanceLabel(type)).append(")\n");
+            sb.append(t("cmd.attack_type.resistance_row", t("attack_type.attack_type." + type.name().toLowerCase()), v, profile.getResistanceLabel(type))).append("\n");
         }
-        sb.append("Sin:\n");
+        sb.append(t("cmd.attack_type.sin_title")).append("\n");
         for (SinType type : SinType.values()) {
             float v = profile.getSinResistance(type);
-            sb.append("  ").append(type.name()).append(": ").append(String.format("%.2f", v))
-                    .append(" (").append(profile.getResistanceLabel(type)).append(")\n");
+            sb.append(t("cmd.attack_type.resistance_row", t("sin.attack_type." + type.name().toLowerCase()), v, profile.getResistanceLabel(type))).append("\n");
         }
 
         ctx.getSource().sendFeedback(() -> Text.literal(sb.toString()), false);
@@ -127,7 +125,7 @@ public class ResistanceCommand {
 
     private static int setResistance(CommandContext<ServerCommandSource> ctx, net.minecraft.entity.Entity entity) {
         if (!(entity instanceof LivingEntity living)) {
-            ctx.getSource().sendError(Text.literal("Target must be a living entity"));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_not_living"));
             return 0;
         }
 
@@ -155,7 +153,7 @@ public class ResistanceCommand {
         }
 
         if (!found) {
-            ctx.getSource().sendError(Text.literal("Unknown type: " + typeName + ". Use slash/pierce/blunt or sin names."));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_unknown_type", typeName));
             return 0;
         }
 
@@ -163,13 +161,14 @@ public class ResistanceCommand {
             ResistanceManager.syncToPlayer(player);
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Set " + typeName + " resistance to " + String.format("%.2f", value) + " for " + entity.getName().getString()), true);
+        String displayName = resolveTypeName(typeName);
+        ctx.getSource().sendFeedback(() -> Text.translatable("cmd.attack_type.set_ok", displayName, value, entity.getName().getString()), true);
         return 1;
     }
 
     private static int resetResistance(CommandContext<ServerCommandSource> ctx, net.minecraft.entity.Entity entity) {
         if (!(entity instanceof LivingEntity living)) {
-            ctx.getSource().sendError(Text.literal("Target must be a living entity"));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_not_living"));
             return 0;
         }
 
@@ -178,13 +177,13 @@ public class ResistanceCommand {
             ResistanceManager.syncToPlayer(player);
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Reset resistance for " + entity.getName().getString()), true);
+        ctx.getSource().sendFeedback(() -> Text.translatable("cmd.attack_type.reset_ok", entity.getName().getString()), true);
         return 1;
     }
 
     private static int tickResistance(CommandContext<ServerCommandSource> ctx, net.minecraft.entity.Entity entity) {
         if (!(entity instanceof LivingEntity living)) {
-            ctx.getSource().sendError(Text.literal("Target must be a living entity"));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_not_living"));
             return 0;
         }
 
@@ -193,23 +192,24 @@ public class ResistanceCommand {
             ResistanceManager.syncToPlayer(player);
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Forced tick on " + entity.getName().getString()), true);
+        ctx.getSource().sendFeedback(() -> Text.translatable("cmd.attack_type.tick_ok", entity.getName().getString()), true);
         return 1;
     }
 
     private static int fragmentGet(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity target) {
         SinFragmentData data = SinFragmentManager.getData(target);
         StringBuilder sb = new StringBuilder();
-        sb.append("=== Fragments: ").append(target.getName().getString()).append(" ===\n");
+        sb.append(t("cmd.attack_type.frag_title", target.getName().getString())).append("\n");
         for (SinType type : SinType.values()) {
             int count = data.getFragments(type);
-            sb.append("  ").append(type.name()).append(": ").append(count);
-            if (count >= 500) sb.append(" [OVERFLOW]");
-            if (count >= 1000) sb.append(" [KILL]");
+            String row = t("cmd.attack_type.frag_row", t("sin.attack_type." + type.name().toLowerCase()), count);
+            sb.append(row);
+            if (count >= 500) sb.append(t("cmd.attack_type.frag_overflow"));
+            if (count >= 1000) sb.append(t("cmd.attack_type.frag_kill"));
             sb.append("\n");
         }
-        sb.append("Active Sin: ").append(data.getActiveSinType().name())
-                .append(" L").append(data.getActiveSinLevel()).append("\n");
+        String sinName = t("sin.attack_type." + data.getActiveSinType().name().toLowerCase());
+        sb.append(t("cmd.attack_type.frag_active", sinName, data.getActiveSinLevel())).append("\n");
         ctx.getSource().sendFeedback(() -> Text.literal(sb.toString()), false);
         return 1;
     }
@@ -226,14 +226,15 @@ public class ResistanceCommand {
             }
         }
         if (sinType == null) {
-            ctx.getSource().sendError(Text.literal("Unknown sin type: " + typeName));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_unknown_sin", typeName));
             return 0;
         }
 
         SinFragmentManager.addFragments(target, sinType, amount);
         NetworkHandler.sendFragmentSync(target);
         int newCount = SinFragmentManager.getFragmentCount(target, sinType);
-        ctx.getSource().sendFeedback(() -> Text.literal("Added " + amount + " " + typeName + " fragments to " + target.getName().getString() + " (now: " + newCount + ")"), true);
+        String sinName = t("sin.attack_type." + sinType.name().toLowerCase());
+        ctx.getSource().sendFeedback(() -> Text.translatable("cmd.attack_type.frag_add_ok", amount, sinName, target.getName().getString(), newCount), true);
         return 1;
     }
 
@@ -249,13 +250,32 @@ public class ResistanceCommand {
             }
         }
         if (sinType == null) {
-            ctx.getSource().sendError(Text.literal("Unknown sin type: " + typeName));
+            ctx.getSource().sendError(Text.translatable("cmd.attack_type.err_unknown_sin", typeName));
             return 0;
         }
 
         SinFragmentManager.getData(target).setFragments(sinType, amount);
         NetworkHandler.sendFragmentSync(target);
-        ctx.getSource().sendFeedback(() -> Text.literal("Set " + typeName + " fragments to " + amount + " for " + target.getName().getString()), true);
+        String sinName = t("sin.attack_type." + sinType.name().toLowerCase());
+        ctx.getSource().sendFeedback(() -> Text.translatable("cmd.attack_type.frag_set_ok", sinName, amount, target.getName().getString()), true);
         return 1;
+    }
+
+    private static String t(String key, Object... args) {
+        return Text.translatable(key, args).getString();
+    }
+
+    private static String resolveTypeName(String typeName) {
+        for (AttackType type : AttackType.values()) {
+            if (type.name().equalsIgnoreCase(typeName)) {
+                return t("attack_type.attack_type." + type.name().toLowerCase());
+            }
+        }
+        for (SinType type : SinType.values()) {
+            if (type.name().equalsIgnoreCase(typeName)) {
+                return t("sin.attack_type." + type.name().toLowerCase());
+            }
+        }
+        return typeName;
     }
 }
