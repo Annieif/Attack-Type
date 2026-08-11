@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import org.attack_type.command.ResistanceCommand;
 import org.attack_type.component.ResistanceManager;
 import org.attack_type.enchantment.ModEnchantments;
+import org.attack_type.fragment.SinFragmentManager;
 import org.attack_type.network.NetworkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,12 @@ public class Attack_type implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             NetworkHandler.sendResistanceSync(handler.player);
+            NetworkHandler.sendFragmentSync(handler.player);
         });
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             ResistanceManager.removeProfile(handler.player.getUuid());
+            SinFragmentManager.removeData(handler.player.getUuid());
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {

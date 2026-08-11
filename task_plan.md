@@ -20,6 +20,14 @@
 | 10 | 攻击类型映射修复 | ✅ done | 弹射物细化：仅箭矢/投掷三叉戟为突刺，雪球等为打击 |
 | 11 | README 规则完善 | ✅ done | 明确弹射物分类规则 |
 | 12 | 调试指令 | ✅ done | 添加 OP 权限调试命令 |
+| 13 | .gitignore 更新 | ✅ completed | 排除 skills/ 和规划文件 |
+| 14 | 罪孽碎片数据模型 | ✅ completed | SinFragmentData 存储7种碎片计数 |
+| 15 | 罪孽碎片 HUD | ✅ completed | 屏幕叠加显示7种碎片数量 |
+| 16 | 碎片触发键位 | ✅ completed | [ ] 切换属性，\ 触发罪孽攻击 |
+| 17 | 碎片使用逻辑 | ✅ completed | 强制触发1500/1000即死 |
+| 18 | 罪孽伤害系统重构 | ✅ completed | 用碎片系统替代随机触发 |
+| 19 | 自动触发配置 | ✅ completed | SinFragmentConfig 配置文件 |
+| 20 | 构建测试 | ✅ completed | BUILD SUCCESSFUL |
 
 ## 伤害公式
 

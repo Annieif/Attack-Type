@@ -1,6 +1,9 @@
 {
   "category.attack_type": "攻击类型",
   "key.attack_type.resistance": "打开抗性分配",
+  "key.attack_type.sin_left": "切换罪孽左",
+  "key.attack_type.sin_right": "切换罪孽右",
+  "key.attack_type.sin_trigger": "触发罪孽攻击",
   "screen.attack_type.resistance": "抗性分配",
   "screen.attack_type.apply": "应用",
   "screen.attack_type.physical": "物理抗性",

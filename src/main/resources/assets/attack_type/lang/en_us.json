@@ -1,6 +1,9 @@
 {
   "category.attack_type": "Attack Type",
   "key.attack_type.resistance": "Open Resistance GUI",
+  "key.attack_type.sin_left": "Cycle Sin Left",
+  "key.attack_type.sin_right": "Cycle Sin Right",
+  "key.attack_type.sin_trigger": "Trigger Sin Attack",
   "screen.attack_type.resistance": "Resistance Allocation",
   "screen.attack_type.apply": "Apply",
   "screen.attack_type.physical": "Physical Resistance",

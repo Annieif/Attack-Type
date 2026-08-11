@@ -4,6 +4,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import org.attack_type.api.AttackType;
@@ -13,6 +14,7 @@ import org.attack_type.api.SinType;
 import org.attack_type.component.ResistanceManager;
 import org.attack_type.enchantment.ModEnchantments;
 import org.attack_type.enchantment.PhysicalResistanceEnchantment;
+import org.attack_type.fragment.SinFragmentManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,11 +48,17 @@ public abstract class MixinLivingEntity {
 
         if (source.getSource() instanceof LivingEntity attacker) {
             physResistance *= getArmorResistance(self, attackType);
+
+            if (attacker instanceof PlayerEntity player && AttackTypeMapper.shouldKillPlayer(attacker)) {
+                player.kill();
+                PENDING_SIN_DAMAGE.set(0.0f);
+                PENDING_PHYS_MULT.set(physResistance);
+                return;
+            }
+
             SinType sinType = AttackTypeMapper.getSinType(attacker);
             if (sinType != null) {
-                int sinLevel = EnchantmentHelper.getLevel(
-                        ModEnchantments.getSinEnchantment(sinType),
-                        attacker.getMainHandStack());
+                int sinLevel = AttackTypeMapper.getSinLevel(attacker);
                 float sinDamage = (sinLevel * 3.0f + 1.0f) * profile.getSinResistance(sinType);
                 PENDING_SIN_DAMAGE.set(sinDamage);
             } else {
