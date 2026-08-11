@@ -64,12 +64,22 @@ public class SinFragmentHUD {
 
             drawIcon(context, tex, cellX, cellY, color, count);
 
-            String countText = String.valueOf(count);
+            String countText;
+            int textColor;
+            if (count >= 1000) {
+                countText = "死";
+                textColor = 0xFFFF4444;
+            } else if (count >= 500) {
+                countText = "溢";
+                textColor = 0xFFFFAA00;
+            } else {
+                countText = String.valueOf(count);
+                textColor = 0xFFFFFF;
+            }
             int tw = client.textRenderer.getWidth(countText);
             int tx = cellX + (ICON_SIZE - tw) / 2;
-            int ty = cellY + ICON_SIZE - 11;
-            int textColor = count >= 1000 ? 0xFFFF0000 : count >= 500 ? 0xFFFF5555 : 0xFFFFFF;
-            context.fill(tx - 2, ty - 1, tx + tw + 2, ty + 10, 0x77000000);
+            int ty = cellY + (ICON_SIZE - 9) / 2;
+            context.fill(tx - 2, ty - 1, tx + tw + 2, ty + 9, 0x88000000);
             context.drawTextWithShadow(client.textRenderer, countText, tx, ty, textColor);
 
             if (isSelected && selectedLevel > 0) {
@@ -77,24 +87,7 @@ public class SinFragmentHUD {
                 int tw2 = client.textRenderer.getWidth(lv);
                 int tx2 = cellX + ICON_SIZE - tw2 - 2;
                 int ty2 = cellY + 2;
-                context.fill(tx2 - 2, ty2 - 1, tx2 + tw2 + 2, ty2 + 10, 0xBB000000);
                 context.drawTextWithShadow(client.textRenderer, lv, tx2, ty2, 0xFFFFEE55);
-            }
-
-            if (count >= 1000) {
-                String kc = "DEATH";
-                int tw3 = client.textRenderer.getWidth(kc);
-                int tx3 = cellX + (ICON_SIZE - tw3) / 2;
-                int ty3 = cellY + (ICON_SIZE / 2) - 5;
-                context.fill(tx3 - 2, ty3 - 1, tx3 + tw3 + 2, ty3 + 10, 0xAAFF0000);
-                context.drawTextWithShadow(client.textRenderer, kc, tx3, ty3, 0xFFFFFFFF);
-            } else if (count >= 500) {
-                String of = "OVER";
-                int tw3 = client.textRenderer.getWidth(of);
-                int tx3 = cellX + (ICON_SIZE - tw3) / 2;
-                int ty3 = cellY + (ICON_SIZE / 2) - 5;
-                context.fill(tx3 - 2, ty3 - 1, tx3 + tw3 + 2, ty3 + 10, 0x99FF4444);
-                context.drawTextWithShadow(client.textRenderer, of, tx3, ty3, 0xFFFFFFFF);
             }
         }
     }
