@@ -352,12 +352,24 @@ SinFragmentManager.getData(target).setFragments(sinType, amount);
         ServerWorld world = source.getWorld();
 
         List<WolfEntity> dogs = new ArrayList<>();
+        String[] names = {
+            "All 0.0",
+            "Slash 0.0",
+            "Pierce 0.0",
+            "Blunt 0.0",
+            "Wrath 0.0",
+            "All 50.0",
+            "All 0.0 prod=0.1",
+            "Slash 100",
+            "Pierce 100",
+            "Blunt 100"
+        };
 
         for (int i = 0; i < 10; i++) {
             WolfEntity wolf = new WolfEntity(net.minecraft.entity.EntityType.WOLF, world);
             BlockPos spawnPos = pos.add(i * 2, 0, 0);
             wolf.refreshPositionAndAngles(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, 0, 0);
-            wolf.setCustomName(Text.translatable("cmd.attack_type.test_dog_name", i + 1));
+            wolf.setCustomName(Text.literal(names[i]));
             wolf.setCustomNameVisible(true);
             wolf.setPersistent();
             wolf.setHealth(wolf.getMaxHealth());

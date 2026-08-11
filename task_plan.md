@@ -6,70 +6,82 @@
 
 ## 阶段概览
 
-| 阶段 | 名称            | 状态             | 说明                                                       |
-|----|---------------|----------------|----------------------------------------------------------|
-| 1  | 核心数据模型        | ✅ done         | SinType 枚举、ResistanceProfile、AttackType、AttackTypeMapper |
-| 2  | 伤害分类系统        | ✅ done         | Mixin 捕获攻击类型、伤害来源分类                                      |
-| 3  | 罪孽附魔          | ✅ done         | 7种罪孽附魔（暴怒/色欲/怠惰/暴食/忧郁/傲慢/嫉妒），最高5级                        |
-| 4  | 物理抗性附魔        | ✅ done         | 3种护甲抗性附魔（斩击/突刺/打击抗性），最高4级                                |
-| 5  | 实体抗性系统        | ✅ done         | ResistanceProfile 组件、随机分配、周期衰减                           |
-| 6  | 伤害计算 Mixin    | ✅ done         | 修改 LivingEntity.damage() 实现伤害公式                          |
-| 7  | 玩家 GUI        | ✅ done         | U键切换、抗性分配界面、网络同步                                         |
-| 8  | 测试与打磨         | ✅ done         | 构建成功，API 兼容性修复                                           |
-| 9  | Git 初始化       | ✅ done         | 初始化 git 仓库并提交                                            |
-| 10 | 攻击类型映射修复      | ✅ done         | 弹射物细化：仅箭矢/投掷三叉戟为突刺，雪球等为打击                                |
-| 11 | README 规则完善   | ✅ done         | 明确弹射物分类规则                                                |
-| 12 | 调试指令          | ✅ done         | 添加 OP 权限调试命令                                             |
-| 13 | .gitignore 更新 | ✅ completed    | 排除 skills/ 和规划文件                                         |
-| 14 | 罪孽碎片数据模型      | ✅ completed    | SinFragmentData 存储7种碎片计数                                 |
-| 15 | 罪孽碎片 HUD      | ✅ completed    | 屏幕叠加显示7种碎片数量                                             |
-| 16 | 碎片触发键位        | ✅ completed    | [ ] 切换属性，\ 触发罪孽攻击                                        |
-| 17 | 碎片使用逻辑        | ✅ completed    | 强制触发500/1000即死                                           |
-| 18 | 罪孽伤害系统重构      | ✅ completed    | 用碎片系统替代随机触发                                              |
-| 19 | 自动触发配置        | ✅ completed    | SinFragmentConfig 配置文件                                   |
-| 20 | 构建测试          | ✅ completed    | BUILD SUCCESSFUL                                         |
-| 21 | 图片资源整理        | ✅ completed    | webp→png 转换，移动到 textures/gui/sin_fragment/           |
-| 22 | HUD图标化重构      | ✅ completed    | 7个32×32罪孽图标，中间显示数量，边框状态提示                |
-| 23 | 文本国际化         | ✅ completed    | 所有硬编码改为翻译键，zh_cn.json + en_us.json 全覆盖     |
-| 24 | ResistanceScreen UI 修复 | ✅ completed    | 单列布局、删除输入框阴影、数值越界提示、修复标签错位 |
-| 25 | 其他生物罪孽触发 | ✅ completed | 非玩家生物: 5%基础随机触发(等级1~3)+附魔类型&等级加成 |
-| 26 | README 更新与 Git 提交 | ✅ completed | 文档：碎片系统+键位+指令+怪物随机触发，提交 commit |
-| 27 | 项目全面审查与优化 | ✅ completed | 修复6个问题：语言文件无效条目、README数值不一致、HUD L标签不消失、溢出提示渲染、死代码标记 |
-| 28 | 函数级注释 + 代码审计 + 规则汇总 + README重写 | ✅ done | 23个Java文件逐一添加Javadoc，审计代码质量，修复getResistanceLabel缺失，汇总24条系统规则，重写README |
-| 29 | 罪孽颜色修正 + 配置化数据采集 + 生成配置文件 | ✅ done | README颜色对齐图标(红橙黄草绿天蓝深蓝紫)，采集所有罪孽相关数据，生成JSON配置文件 |
-| 30 | 罪孽碎片获取系统 + 粒子效果 + QoL | ✅ done | 7种罪孽独立碎片获取方式、攻击粒子效果、反复进食/睡觉 |
-| 31 | 总积衰减 + 测试指令 + 解除上限 | 🔄 in_progress | 碎片500减总积、/attacktype test生成测试狗、解除抗性<5限制 |
+| 阶段 | 名称                             | 状态             | 说明                                                                    |
+|----|--------------------------------|----------------|-----------------------------------------------------------------------|
+| 1  | 核心数据模型                         | ✅ done         | SinType 枚举、ResistanceProfile、AttackType、AttackTypeMapper              |
+| 2  | 伤害分类系统                         | ✅ done         | Mixin 捕获攻击类型、伤害来源分类                                                   |
+| 3  | 罪孽附魔                           | ✅ done         | 7种罪孽附魔（暴怒/色欲/怠惰/暴食/忧郁/傲慢/嫉妒），最高5级                                     |
+| 4  | 物理抗性附魔                         | ✅ done         | 3种护甲抗性附魔（斩击/突刺/打击抗性），最高4级                                             |
+| 5  | 实体抗性系统                         | ✅ done         | ResistanceProfile 组件、随机分配、周期衰减                                        |
+| 6  | 伤害计算 Mixin                     | ✅ done         | 修改 LivingEntity.damage() 实现伤害公式                                       |
+| 7  | 玩家 GUI                         | ✅ done         | U键切换、抗性分配界面、网络同步                                                      |
+| 8  | 测试与打磨                          | ✅ done         | 构建成功，API 兼容性修复                                                        |
+| 9  | Git 初始化                        | ✅ done         | 初始化 git 仓库并提交                                                         |
+| 10 | 攻击类型映射修复                       | ✅ done         | 弹射物细化：仅箭矢/投掷三叉戟为突刺，雪球等为打击                                             |
+| 11 | README 规则完善                    | ✅ done         | 明确弹射物分类规则                                                             |
+| 12 | 调试指令                           | ✅ done         | 添加 OP 权限调试命令                                                          |
+| 13 | .gitignore 更新                  | ✅ completed    | 排除 skills/ 和规划文件                                                      |
+| 14 | 罪孽碎片数据模型                       | ✅ completed    | SinFragmentData 存储7种碎片计数                                              |
+| 15 | 罪孽碎片 HUD                       | ✅ completed    | 屏幕叠加显示7种碎片数量                                                          |
+| 16 | 碎片触发键位                         | ✅ completed    | [ ] 切换属性，\ 触发罪孽攻击                                                     |
+| 17 | 碎片使用逻辑                         | ✅ completed    | 强制触发500/1000即死                                                        |
+| 18 | 罪孽伤害系统重构                       | ✅ completed    | 用碎片系统替代随机触发                                                           |
+| 19 | 自动触发配置                         | ✅ completed    | SinFragmentConfig 配置文件                                                |
+| 20 | 构建测试                           | ✅ completed    | BUILD SUCCESSFUL                                                      |
+| 21 | 图片资源整理                         | ✅ completed    | webp→png 转换，移动到 textures/gui/sin_fragment/                            |
+| 22 | HUD图标化重构                       | ✅ completed    | 7个32×32罪孽图标，中间显示数量，边框状态提示                                             |
+| 23 | 文本国际化                          | ✅ completed    | 所有硬编码改为翻译键，zh_cn.json + en_us.json 全覆盖                                |
+| 24 | ResistanceScreen UI 修复         | ✅ completed    | 单列布局、删除输入框阴影、数值越界提示、修复标签错位                                            |
+| 25 | 其他生物罪孽触发                       | ✅ completed    | 非玩家生物: 5%基础随机触发(等级1~3)+附魔类型&等级加成                                      |
+| 26 | README 更新与 Git 提交              | ✅ completed    | 文档：碎片系统+键位+指令+怪物随机触发，提交 commit                                        |
+| 27 | 项目全面审查与优化                      | ✅ completed    | 修复6个问题：语言文件无效条目、README数值不一致、HUD L标签不消失、溢出提示渲染、死代码标记                   |
+| 28 | 函数级注释 + 代码审计 + 规则汇总 + README重写 | ✅ done         | 23个Java文件逐一添加Javadoc，审计代码质量，修复getResistanceLabel缺失，汇总24条系统规则，重写README |
+| 29 | 罪孽颜色修正 + 配置化数据采集 + 生成配置文件      | ✅ done         | README颜色对齐图标(红橙黄草绿天蓝深蓝紫)，采集所有罪孽相关数据，生成JSON配置文件                        |
+| 30 | 罪孽碎片获取系统 + 粒子效果 + QoL          | ✅ done         | 7种罪孽独立碎片获取方式、攻击粒子效果、反复进食/睡觉                                           |
+| 31 | 总积衰减 + 测试指令 + 解除上限             | ✅ done | 碎片500减总积、/attacktype test生成测试狗、解除抗性<5限制 |
+| 32 | 测试狼直观命名 + Modrinth 英文文档 | 🔄 in_progress | 测试狗名称反映抗性值、完整英文文档准备发布 |
+
+## 阶段32 — 测试狼直观命名 + Modrinth 英文文档
+
+### 子任务
+
+| # | 任务 | 状态 | 说明 |
+|---|------|------|------|
+| 32a | 测试狼直观命名 | ✅ done | 名称如"All 0.0"/"Slash 100"等反映抗性配置 |
+| 32b | 完整英文 README | ✅ done | README_EN.md 覆盖所有系统、规则、指令、技术细节 |
+| 32c | 构建测试 | ⬜ pending | BUILD SUCCESSFUL |
+| 32d | Git 提交 + 推送 | ⬜ pending | commit + push |
 
 ## 阶段31 — 总积衰减 + 测试指令 + 解除上限
 
 ### 子任务
 
-| # | 任务 | 状态 | 说明 |
-|---|------|------|------|
-| 31a | 碎片≥500 减少总积 | ✅ done | 任意罪孽碎片首次达500，totalProduct-0.1，最低0.1 |
-| 31b | 解除抗性 <5.0 上限 | ✅ done | ResistanceProfile + 命令参数移除上限 |
-| 31c | /attacktype test 测试狗 | ✅ done | 生成10只极端抗性测试狗，互相敌对 |
-| 31d | README 更新 | ✅ done | 记录新规则 |
-| 31e | 构建测试 | ✅ done | BUILD SUCCESSFUL |
-| 31f | Git 提交 + 推送 | ⬜ pending | commit + push remote |
+| #   | 任务                   | 状态     | 说明                                  |
+|-----|----------------------|--------|-------------------------------------|
+| 31a | 碎片≥500 减少总积          | ✅ done | 任意罪孽碎片首次达500，totalProduct-0.1，最低0.1 |
+| 31b | 解除抗性 <5.0 上限         | ✅ done | ResistanceProfile + 命令参数移除上限        |
+| 31c | /attacktype test 测试狗 | ✅ done | 生成10只极端抗性测试狗，互相敌对                   |
+| 31d | README 更新            | ✅ done | 记录新规则                               |
+| 31e | 构建测试                 | ✅ done | BUILD SUCCESSFUL                    |
+| 31f | Git 提交 + 推送          | ✅ done | commit e1bdd06 + push origin main   |
 
 ## 阶段30 — 罪孽碎片获取系统 + 粒子效果 + QoL
 
 ### 子任务
 
-| # | 任务 | 状态 | 说明 |
-|---|------|------|------|
-| 30a | README 规则记录 | ✅ done | 记录7种罪孽碎片获取规则到README |
-| 30b | 暴怒 — 连杀追踪 | ✅ done | 记录上次击杀时间，计算间隔给碎片 |
-| 30c | 色欲 — 繁殖与变异 | ✅ done | 繁殖/鸡蛋/治疗/闪电变异/溺尸转化 |
-| 30d | 怠惰 — 静止睡眠 + 反复睡觉 | ✅ done | AFK检测/睡眠完成/白天可睡 |
-| 30e | 暴食 — 进食 + 反复进食 | ✅ done | 食物使用检测/满饱食度可吃 |
-| 30f | 忧郁 — 受伤与目击 | ✅ done | 自伤追踪/附近生物受伤追踪 |
-| 30g | 傲慢 — 成就与生产 | ✅ done | 进度/合成/烧炼/酿造/附魔 |
-| 30h | 嫉妒 — 攀比与目击 | ✅ done | 装备比较/罪孽攻击目击 |
-| 30i | 罪孽攻击粒子效果 | ✅ done | 每种罪孽独特的粒子颜色/效果 |
+| #   | 任务                  | 状态     | 说明                      |
+|-----|---------------------|--------|-------------------------|
+| 30a | README 规则记录         | ✅ done | 记录7种罪孽碎片获取规则到README     |
+| 30b | 暴怒 — 连杀追踪           | ✅ done | 记录上次击杀时间，计算间隔给碎片        |
+| 30c | 色欲 — 繁殖与变异          | ✅ done | 繁殖/鸡蛋/治疗/闪电变异/溺尸转化      |
+| 30d | 怠惰 — 静止睡眠 + 反复睡觉    | ✅ done | AFK检测/睡眠完成/白天可睡         |
+| 30e | 暴食 — 进食 + 反复进食      | ✅ done | 食物使用检测/满饱食度可吃           |
+| 30f | 忧郁 — 受伤与目击          | ✅ done | 自伤追踪/附近生物受伤追踪           |
+| 30g | 傲慢 — 成就与生产          | ✅ done | 进度/合成/烧炼/酿造/附魔          |
+| 30h | 嫉妒 — 攀比与目击          | ✅ done | 装备比较/罪孽攻击目击             |
+| 30i | 罪孽攻击粒子效果            | ✅ done | 每种罪孽独特的粒子颜色/效果          |
 | 30j | sin_types.json 配置更新 | ✅ done | 新碎片获取参数、粒子效果、QoL 加入配置文件 |
-| 30k | 构建测试 | ✅ done | BUILD SUCCESSFUL |
+| 30k | 构建测试                | ✅ done | BUILD SUCCESSFUL        |
 
 ## 阶段27 — 项目全面审查与优化
 
@@ -77,16 +89,17 @@
 
 **发现并修复的问题：**
 
-| # | 问题 | 文件 | 修复 |
-|---|------|------|------|
-| 1 | `attack_type.attack_type.fierce` 无效条目（无对应枚举） | zh_cn.json, en_us.json | 删除 |
-| 2 | README 手动触发消耗写错：100/200/300 → 实际 40/70/100 | README.md | 修正 |
-| 3 | README 附魔减耗写错：10% → 实际 -2/级 | README.md | 修正 |
-| 4 | HUD L1/L2/L3 标签不消失（客户端不检查过期时间） | SinFragmentHUD.java | 添加 worldTime < expiry 检查 |
-| 5 | ResistanceScreen 溢出提示被 TextFieldWidget 覆盖 | ResistanceScreen.java | 溢出提示移到 super.render() 之后 |
-| 6 | SinFragmentConfig 未被任何代码引用（死代码） | README.md | 标记为"预留，暂未启用" |
+| # | 问题                                           | 文件                     | 修复                       |
+|---|----------------------------------------------|------------------------|--------------------------|
+| 1 | `attack_type.attack_type.fierce` 无效条目（无对应枚举） | zh_cn.json, en_us.json | 删除                       |
+| 2 | README 手动触发消耗写错：100/200/300 → 实际 40/70/100   | README.md              | 修正                       |
+| 3 | README 附魔减耗写错：10% → 实际 -2/级                  | README.md              | 修正                       |
+| 4 | HUD L1/L2/L3 标签不消失（客户端不检查过期时间）               | SinFragmentHUD.java    | 添加 worldTime < expiry 检查 |
+| 5 | ResistanceScreen 溢出提示被 TextFieldWidget 覆盖    | ResistanceScreen.java  | 溢出提示移到 super.render() 之后 |
+| 6 | SinFragmentConfig 未被任何代码引用（死代码）              | README.md              | 标记为"预留，暂未启用"             |
 
 **一致性验证通过项：**
+
 - AttackType 3种类型 + SinType 7种类型，枚举与语言文件一一对应 ✓
 - 伤害公式：代码与 README 一致 ✓
 - 网络包：客户端/服务端同步逻辑完整 ✓
@@ -112,12 +125,15 @@
 ## 阶段24 — UI 修复细节
 
 **问题分析（截图证据）：**
-1. **标签错位**：双列布局下 `col2LabelX = col2FieldX - 42 = centerX - 34`，此位置正好落在左输入框的范围内（centerX-80 ~ centerX-8），导致右列的标签渲染到了左列输入框上，出现"输入框内含突刺文字"的视觉Bug
+
+1. **标签错位**：双列布局下 `col2LabelX = col2FieldX - 42 = centerX - 34`，此位置正好落在左输入框的范围内（centerX-80 ~
+   centerX-8），导致右列的标签渲染到了左列输入框上，出现"输入框内含突刺文字"的视觉Bug
 2. **杂乱**：双列布局紧凑，标签、输入框、状态三列挤在一起，42px 标签宽度不足显示中文
 3. **无>5提示**：当输入值超过 clamp 上限 (5.0) 时，无视觉提示告知用户数值将被截断
 4. **输入框阴影**：TextFieldWidget 绘制了默认背景阴影（橙色选中框的阴影），选中光标移动时阴影不跟随，需移除
 
 **修复方案：**
+
 - 改为单列布局：`[标签]  [输入框]  [状态]`，所有元素居中对齐一行一个
 - 删除 TextFieldWidget 背景阴影：`tf.setDrawsBackground(false)` 并自绘简洁边框
 - 输入值 > 5.0 时，输入框数字用红色或在旁边显示"×"标记
@@ -125,7 +141,7 @@
 
 ## 遇到的错误
 
-| 错误 | 尝试次数 | 解决方案 |
-|----|------|------|
-| Double 类型编译错误 - getString() 在 String 上调用 | 1 | 移除多余的 .getString()（t() 已返回 String） |
-| col2LabelX 与左输入框 X 范围重叠 | 0 | 改为单列布局 |
+| 错误                                       | 尝试次数 | 解决方案                               |
+|------------------------------------------|------|------------------------------------|
+| Double 类型编译错误 - getString() 在 String 上调用 | 1    | 移除多余的 .getString()（t() 已返回 String） |
+| col2LabelX 与左输入框 X 范围重叠                  | 0    | 改为单列布局                             |
