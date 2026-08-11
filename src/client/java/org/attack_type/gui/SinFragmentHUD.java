@@ -25,8 +25,8 @@ public class SinFragmentHUD {
     };
 
     public static final int ICON_SIZE = 32;
-    private static final int PADDING = 2;
-    private static final int ROWS = 1;
+    private static final int PADDING = 3;
+    private static final int CORNER = 2;
 
     public static void render(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -36,10 +36,6 @@ public class SinFragmentHUD {
         SinType selected = ClientFragmentCache.getActiveSinType();
         int selectedLevel = ClientFragmentCache.getActiveSinLevel();
 
-        int cols = types.length;
-        int totalWidth = cols * ICON_SIZE + (cols + 1) * PADDING;
-        int totalHeight = ROWS * ICON_SIZE + (ROWS + 1) * PADDING + 14;
-
         int x = 4;
         int y = 4;
 
@@ -47,31 +43,34 @@ public class SinFragmentHUD {
             SinType type = types[i];
             int count = ClientFragmentCache.getFragments(type);
             Identifier tex = TEXTURES[i];
-            int color = COLORS[i];
             boolean isSelected = selected == type;
 
             int cellX = x + PADDING + i * (ICON_SIZE + PADDING);
             int cellY = y + PADDING;
 
-            if (isSelected) {
-                context.fill(cellX - 1, cellY - 1, cellX + ICON_SIZE + 1, cellY + ICON_SIZE + 1, 0xFFFFAA00);
-            }
             if (count >= 1000) {
-                context.fill(cellX - 2, cellY - 2, cellX + ICON_SIZE + 2, cellY + ICON_SIZE + 2, 0xFFFF0000);
+                context.fill(cellX - 1, cellY - 1, cellX + ICON_SIZE + 1, cellY + ICON_SIZE + 1, 0xBBDD0000);
             } else if (count >= 500) {
-                context.fill(cellX - 1, cellY - 1, cellX + ICON_SIZE + 1, cellY + ICON_SIZE + 1, 0x99FF5555);
+                context.fill(cellX - 1, cellY - 1, cellX + ICON_SIZE + 1, cellY + ICON_SIZE + 1, 0x99DD5500);
             }
 
-            drawIcon(context, tex, cellX, cellY, color, count);
+            drawIcon(context, tex, cellX, cellY, count);
+
+            if (isSelected) {
+                drawGoldCorners(context, cellX, cellY);
+            }
 
             String countText;
             int textColor;
             if (count >= 1000) {
                 countText = "死";
-                textColor = 0xFFFF4444;
+                textColor = 0xFF6666;
             } else if (count >= 500) {
                 countText = "溢";
-                textColor = 0xFFFFAA00;
+                textColor = 0xFFBB44;
+            } else if (count == 0) {
+                countText = "0";
+                textColor = 0x999999;
             } else {
                 countText = String.valueOf(count);
                 textColor = 0xFFFFFF;
@@ -79,23 +78,34 @@ public class SinFragmentHUD {
             int tw = client.textRenderer.getWidth(countText);
             int tx = cellX + (ICON_SIZE - tw) / 2;
             int ty = cellY + (ICON_SIZE - 9) / 2;
-            context.fill(tx - 2, ty - 1, tx + tw + 2, ty + 9, 0x88000000);
+            context.fill(tx - 1, ty - 1, tx + tw + 1, ty + 9, 0x55000000);
             context.drawTextWithShadow(client.textRenderer, countText, tx, ty, textColor);
 
             if (isSelected && selectedLevel > 0) {
                 String lv = "L" + selectedLevel;
                 int tw2 = client.textRenderer.getWidth(lv);
-                int tx2 = cellX + ICON_SIZE - tw2 - 2;
-                int ty2 = cellY + 2;
-                context.drawTextWithShadow(client.textRenderer, lv, tx2, ty2, 0xFFFFEE55);
+                int tx2 = cellX + ICON_SIZE - tw2 - 1;
+                int ty2 = cellY + 1;
+                context.drawTextWithShadow(client.textRenderer, lv, tx2, ty2, 0xFFEE77);
             }
         }
     }
 
-    private static void drawIcon(DrawContext context, Identifier tex, int x, int y, int color, int count) {
-        float alpha = 0.4f + Math.min(0.6f, count / 500.0f);
-        int a = (int) (alpha * 255);
-        int rgba = (a << 24) | (color & 0x00FFFFFF);
+    private static void drawGoldCorners(DrawContext ctx, int x, int y) {
+        int color = 0xFFFFD866;
+        int s = ICON_SIZE;
+        ctx.fill(x - 1, y - 1, x + CORNER + 1, y, color);
+        ctx.fill(x - 1, y - 1, x, y + CORNER, color);
+        ctx.fill(x + s - CORNER, y - 1, x + s + 1, y, color);
+        ctx.fill(x + s, y - 1, x + s + 1, y + CORNER, color);
+        ctx.fill(x - 1, y + s, x + CORNER + 1, y + s + 1, color);
+        ctx.fill(x - 1, y + s - CORNER, x, y + s + 1, color);
+        ctx.fill(x + s - CORNER, y + s, x + s + 1, y + s + 1, color);
+        ctx.fill(x + s, y + s - CORNER, x + s + 1, y + s + 1, color);
+    }
+
+    private static void drawIcon(DrawContext context, Identifier tex, int x, int y, int count) {
+        float alpha = 0.5f + Math.min(0.5f, count / 1000.0f);
         context.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
         context.drawTexture(tex, x, y, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
         context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
