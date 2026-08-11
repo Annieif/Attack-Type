@@ -2,7 +2,9 @@ package org.attack_type.component;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.attack_type.api.ResistanceProfile;
+import org.attack_type.network.NetworkHandler;
 
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +31,21 @@ public class ResistanceManager {
 
     public static void removeProfile(UUID uuid) {
         PROFILES.remove(uuid);
+    }
+
+    public static ResistanceProfile getOrCreateProfile(LivingEntity entity) {
+        return getProfile(entity);
+    }
+
+    public static void resetProfile(LivingEntity entity) {
+        ResistanceProfile profile = getProfile(entity);
+        profile.reset();
+        profile.randomizeResistances();
+        profile.normalize();
+    }
+
+    public static void syncToPlayer(ServerPlayerEntity player) {
+        NetworkHandler.sendResistanceSync(player);
     }
 
     public static void tickEntityResistance(LivingEntity entity, long worldTime) {

@@ -34,3 +34,26 @@
 ### 构建结果
 - BUILD SUCCESSFUL (2次)
 - 产物: build/libs/Attack_Type-1.0-SNAPSHOT.jar
+
+## 会话 2: 2026-08-10
+
+### 阶段9: Git 初始化
+- 初始化 git 仓库并创建 .gitignore
+- 排除 .gradle/、build/ 等构建产物
+
+### 阶段10: 攻击类型映射修复
+- 修复弹射物分类：仅 ArrowEntity 和 TridentEntity 为 PIERCE
+- 雪球、鸡蛋等其余弹射物归为 BLUNT
+
+### 阶段11: README 规则完善
+- 更新攻击类型来源表，明确弹射物分类规则
+- 添加调试指令说明
+
+### 阶段12: 调试指令
+- 创建 ResistanceCommand.java
+- 支持 /attacktype get/set/reset/tick
+- 需要 OP 权限（level 2）
+- 添加 ResistanceManager.getOrCreateProfile/resetProfile/syncToPlayer
+
+### 构建结果
+- BUILD SUCCESSFUL (3次)

@@ -1,6 +1,8 @@
 package org.attack_type.api;
 
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
@@ -11,8 +13,11 @@ import org.attack_type.enchantment.ModEnchantments;
 public class AttackTypeMapper {
 
     public static AttackType getAttackType(DamageSource source) {
-        if (source.getSource() instanceof ProjectileEntity) {
-            return AttackType.PIERCE;
+        if (source.getSource() instanceof ProjectileEntity projectile) {
+            if (projectile instanceof ArrowEntity || projectile instanceof TridentEntity) {
+                return AttackType.PIERCE;
+            }
+            return AttackType.BLUNT;
         }
 
         if (source.getSource() instanceof LivingEntity attacker) {

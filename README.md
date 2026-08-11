@@ -9,9 +9,11 @@ Minecraft Fabric 1.20.1 模组，实现"攻击类型"和"罪孽属性"伤害系�
 | 类型 | 来源 |
 |------|------|
 | **斩击 (SLASH)** | 剑、斧、三叉戟（近战） |
-| **突刺 (PIERCE)** | 箭矢、投掷三叉戟等弹射物 |
-| **打击 (BLUNT)** | 空手、镐、锹等其余物品 |
+| **突刺 (PIERCE)** | 箭矢（含药箭）、投掷三叉戟 |
+| **打击 (BLUNT)** | 空手、镐、锹、雪球、鸡蛋等其余物品和弹射物 |
 | **无类型 (NONE)** | 摔落、窒息、中毒、火焰等非物理伤害 |
+
+> **弹射物分类规则：** 并非所有弹射物都是突刺。仅箭矢（ArrowEntity）和投掷三叉戟（TridentEntity）为突刺，雪球、鸡蛋等弹射物均为打击。
 
 ### 罪孽属性
 
@@ -77,10 +79,25 @@ src/
 │   │   └── SinEnchantment.java
 │   ├── mixin/
 │   │   └── MixinLivingEntity.java       # 伤害计算注入
+│   ├── command/
+│   │   └── ResistanceCommand.java       # OP 调试指令
 │   └── network/
 │       ├── ModPackets.java              # 网络包标识
 │       └── NetworkHandler.java          # 服务端网络处理
 ```
+
+---
+
+## 调试指令（需 OP 权限）
+
+| 指令 | 说明 |
+|------|------|
+| `/attacktype get [实体]` | 查看自身或指定实体的抗性值 |
+| `/attacktype set <类型> <值> [实体]` | 设置指定抗性类型值（0.0~5.0） |
+| `/attacktype reset [实体]` | 重置实体抗性为默认随机值 |
+| `/attacktype tick [实体]` | 强制触发一次抗性周期更新 |
+
+类型参数支持：`slash`、`pierce`、`blunt`、`wrath`、`lust`、`sloth`、`gluttony`、`gloom`、`pride`、`envy`
 
 ---
 
@@ -117,14 +134,17 @@ public enum SinType {
 
 ### 2. AttackTypeMapper — 攻击分类器
 
-核心逻辑：根据 `DamageSource` 判定攻击类型和罪孽属性。
+核心逻辑：根据 `DamageSource` 判定攻击类型和罪孽属性。弹射物仅箭矢和投掷三叉戟为突刺，雪球、鸡蛋等为打击。
 
 ```java
 // src/main/java/org/attack_type/api/AttackTypeMapper.java
 public static AttackType getAttackType(DamageSource source) {
-    // 弹射物 → 突刺
-    if (source.getSource() instanceof ProjectileEntity) {
-        return AttackType.PIERCE;
+    // 弹射物：仅箭矢和投掷三叉戟为突刺，其余为打击
+    if (source.getSource() instanceof ProjectileEntity projectile) {
+        if (projectile instanceof ArrowEntity || projectile instanceof TridentEntity) {
+            return AttackType.PIERCE;
+        }
+        return AttackType.BLUNT;
     }
     // 近战 → 按武器判定
     if (source.getSource() instanceof LivingEntity attacker) {
