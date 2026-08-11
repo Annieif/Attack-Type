@@ -21,6 +21,7 @@ import java.util.Random;
  *   <tr><td>一般</td><td>= 1.0</td><td>正常伤害</td></tr>
  *   <tr><td>耐性</td><td>&lt; 1.0</td><td>受到该类型伤害减少</td></tr>
  *   <tr><td>抵抗</td><td>&le; 0.5</td><td>受到该类型伤害大幅减少</td></tr>
+ *   <tr><td>免疫</td><td>= 0.0</td><td>完全免疫该类型伤害</td></tr>
  * </table>
  */
 public class ResistanceProfile {
@@ -246,7 +247,8 @@ public class ResistanceProfile {
         if (value > 1.0f) return "resistance.label.vulnerable";
         if (value == 1.0f) return "resistance.label.normal";
         if (value > 0.5f) return "resistance.label.tough";
-        return "resistance.label.resist";
+        if (value > 0.0f) return "resistance.label.resist";
+        return "resistance.label.immune";
     }
 
     /**

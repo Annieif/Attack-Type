@@ -19,15 +19,13 @@
   "resistance.label.normal": "一般",
   "resistance.label.tough": "耐性",
   "resistance.label.resist": "抵抗",
+  "resistance.label.immune": "免疫",
   "hud.attack_type.active_sin": "激活罪孽: %s",
   "hud.attack_type.overflow_char": "溢",
   "hud.attack_type.death_char": "死",
-
   "attack_type.attack_type.slash": "斩击",
   "attack_type.attack_type.pierce": "突刺",
   "attack_type.attack_type.blunt": "打击",
-  
-
   "sin.attack_type.wrath": "暴怒",
   "sin.attack_type.lust": "色欲",
   "sin.attack_type.sloth": "怠惰",
@@ -35,7 +33,6 @@
   "sin.attack_type.gloom": "忧郁",
   "sin.attack_type.pride": "傲慢",
   "sin.attack_type.envy": "嫉妒",
-
   "enchantment.attack_type.wrath": "暴怒",
   "enchantment.attack_type.lust": "色欲",
   "enchantment.attack_type.sloth": "怠惰",
@@ -43,11 +40,9 @@
   "enchantment.attack_type.gloom": "忧郁",
   "enchantment.attack_type.pride": "傲慢",
   "enchantment.attack_type.envy": "嫉妒",
-
   "enchantment.attack_type.slash_resistance": "斩击抗性",
   "enchantment.attack_type.pierce_resistance": "突刺抗性",
   "enchantment.attack_type.blunt_resistance": "打击抗性",
-
   "enchantment.attack_type.wrath.desc": "攻击附带暴怒罪孽伤害",
   "enchantment.attack_type.lust.desc": "攻击附带色欲罪孽伤害",
   "enchantment.attack_type.sloth.desc": "攻击附带怠惰罪孽伤害",
@@ -55,11 +50,9 @@
   "enchantment.attack_type.gloom.desc": "攻击附带忧郁罪孽伤害",
   "enchantment.attack_type.pride.desc": "攻击附带傲慢罪孽伤害",
   "enchantment.attack_type.envy.desc": "攻击附带嫉妒罪孽伤害",
-
   "enchantment.attack_type.slash_resistance.desc": "减少受到的斩击伤害",
   "enchantment.attack_type.pierce_resistance.desc": "减少受到的突刺伤害",
   "enchantment.attack_type.blunt_resistance.desc": "减少受到的打击伤害",
-
   "cmd.attack_type.err_not_living": "目标必须是生物",
   "cmd.attack_type.err_unknown_type": "未知类型: %s。使用 slash/pierce/blunt 或罪孽名称",
   "cmd.attack_type.err_unknown_sin": "未知罪孽类型: %s",

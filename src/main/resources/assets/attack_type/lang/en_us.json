@@ -19,6 +19,7 @@
   "resistance.label.normal": "Normal",
   "resistance.label.tough": "Tough",
   "resistance.label.resist": "Resist",
+  "resistance.label.immune": "Immune",
   "hud.attack_type.active_sin": "Active Sin: %s",
   "hud.attack_type.overflow_char": "!",
   "hud.attack_type.death_char": "X",

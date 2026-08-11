@@ -39,7 +39,20 @@
 | 29 | 罪孽颜色修正 + 配置化数据采集 + 生成配置文件      | ✅ done         | README颜色对齐图标(红橙黄草绿天蓝深蓝紫)，采集所有罪孽相关数据，生成JSON配置文件                        |
 | 30 | 罪孽碎片获取系统 + 粒子效果 + QoL          | ✅ done         | 7种罪孽独立碎片获取方式、攻击粒子效果、反复进食/睡觉                                           |
 | 31 | 总积衰减 + 测试指令 + 解除上限             | ✅ done | 碎片500减总积、/attacktype test生成测试狗、解除抗性<5限制 |
-| 32 | 测试狼直观命名 + Modrinth 英文文档 | 🔄 in_progress | 测试狗名称反映抗性值、完整英文文档准备发布 |
+| 32 | 测试狼直观命名 + Modrinth 英文文档 | ✅ done | 测试狗名称反映抗性值、完整英文文档准备发布 |
+| 33 | 抗性等级标签统一（免疫/致命） | 🔄 in_progress | x0.0=免疫, x50=致命, 修正所有不符合表述 |
+
+## 阶段33 — 抗性等级标签统一（免疫/致命）
+
+### 子任务
+
+| # | 任务 | 状态 | 说明 |
+|---|------|------|------|
+| 33a | ResistanceProfile 增加 Immune 等级 | ✅ done | getResistanceLabel() + Javadoc |
+| 33b | 语言文件添加 Immune 键 | ✅ done | zh_cn/en_us 新增 "免疫"/"Immune" |
+| 33c | ResistanceCommand 注释修正 | ✅ done | #0 极端脆弱→免疫, #5 极端抵抗→致命 |
+| 33d | README 表格修正 | ✅ done | 三份 README 添加免疫等级 |
+| 33e | 构建测试 + 提交推送 | ⬜ pending | BUILD SUCCESSFUL + git |
 
 ## 阶段32 — 测试狼直观命名 + Modrinth 英文文档
 
@@ -49,8 +62,8 @@
 |---|------|------|------|
 | 32a | 测试狼直观命名 | ✅ done | 名称如"All 0.0"/"Slash 100"等反映抗性配置 |
 | 32b | 完整英文 README | ✅ done | README_EN.md 覆盖所有系统、规则、指令、技术细节 |
-| 32c | 构建测试 | ⬜ pending | BUILD SUCCESSFUL |
-| 32d | Git 提交 + 推送 | ⬜ pending | commit + push |
+| 32c | 构建测试 | ✅ done | BUILD SUCCESSFUL |
+| 32d | Git 提交 + 推送 | ✅ done | commit 38371ca + push origin main |
 
 ## 阶段31 — 总积衰减 + 测试指令 + 解除上限
 
@@ -121,6 +134,7 @@
 | 一般 | ×1.0          |
 | 耐性 | < ×1.0        |
 | 抵抗 | ≤ ×0.5        |
+| 免疫 | = ×0.0        |
 
 ## 阶段24 — UI 修复细节
 

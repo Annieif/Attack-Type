@@ -90,6 +90,7 @@ Each entity has 10 resistance multipliers (3 physical + 7 sin), ranging from ≥
 | Normal     | = 1.0          | Normal damage                               |
 | Tough      | < 1.0          | Reduced damage taken                        |
 | Resistant  | ≤ 0.5          | Greatly reduced damage taken                |
+| Immune     | = 0.0          | Completely immune to this damage type       |
 
 All 10 resistance values are constrained by `totalProduct` (geometric mean). Modifying resistances via the GUI automatically normalizes them to maintain the total product.
 
