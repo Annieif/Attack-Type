@@ -1,12 +1,15 @@
 package org.attack_type.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.attack_type.Attack_type;
 import org.attack_type.api.SinType;
 import org.attack_type.fragment.ClientFragmentCache;
+import org.joml.Matrix4f;
 
 public class SinFragmentHUD {
 
@@ -19,11 +22,6 @@ public class SinFragmentHUD {
     public static final Identifier ENVY = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/envy.png");
 
     private static final Identifier[] TEXTURES = {WRATH, LUST, SLOTH, GLUTTONY, GLOOM, PRIDE, ENVY};
-
-    private static final int[] COLORS = {
-            0xFF4444, 0xFF88FF, 0x8888FF,
-            0xFFAA44, 0x6666AA, 0xFFDD44, 0x44DD44
-    };
 
     public static final int ICON_SIZE = 32;
     private static final int PADDING = 3;
@@ -107,8 +105,16 @@ public class SinFragmentHUD {
 
     private static void drawIcon(DrawContext context, Identifier tex, int x, int y, int count) {
         float alpha = 0.5f + Math.min(0.5f, count / 1000.0f);
-        context.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
-        context.drawTexture(tex, x, y, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
-        context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.setShaderTexture(0, tex);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        RenderSystem.enableBlend();
+        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        bufferBuilder.vertex(matrix, x, y + ICON_SIZE, 0).color(1f, 1f, 1f, alpha).texture(0, 1).next();
+        bufferBuilder.vertex(matrix, x + ICON_SIZE, y + ICON_SIZE, 0).color(1f, 1f, 1f, alpha).texture(1, 1).next();
+        bufferBuilder.vertex(matrix, x + ICON_SIZE, y, 0).color(1f, 1f, 1f, alpha).texture(1, 0).next();
+        bufferBuilder.vertex(matrix, x, y, 0).color(1f, 1f, 1f, alpha).texture(0, 0).next();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 }
