@@ -80,6 +80,7 @@ public abstract class MixinLivingEntity {
         Float sinDamage = PENDING_SIN_DAMAGE.get();
         PENDING_SIN_DAMAGE.remove();
         PENDING_PHYS_MULT.remove();
+        AttackTypeMapper.clearMobSinCache();
         return amount * (mult != null ? mult : 1.0f) + (sinDamage != null ? sinDamage : 0.0f);
     }
 
