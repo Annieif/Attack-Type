@@ -11,6 +11,18 @@ import org.attack_type.api.SinType;
 import org.attack_type.fragment.ClientFragmentCache;
 import org.joml.Matrix4f;
 
+/**
+ * 罪孽碎片 HUD 渲染。
+ * <p>
+ * 在屏幕左上角渲染 7 个罪孽图标，显示碎片数量和激活状态。
+ * <ul>
+ *   <li>碎片 ≥500：橙色边框（溢出警告）</li>
+ *   <li>碎片 ≥1000：红色边框（即死警告）</li>
+ *   <li>当前选中罪孽：金色四角高亮</li>
+ *   <li>激活中：图标右上角显示 L1~L3 等级</li>
+ * </ul>
+ * 图标透明度随碎片数量从 50% 渐变到 100%。
+ */
 public class SinFragmentHUD {
 
     public static final Identifier WRATH = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/wrath.png");
@@ -23,10 +35,15 @@ public class SinFragmentHUD {
 
     private static final Identifier[] TEXTURES = {WRATH, LUST, SLOTH, GLUTTONY, GLOOM, PRIDE, ENVY};
 
+    /** 图标像素尺寸 */
     public static final int ICON_SIZE = 32;
     private static final int PADDING = 3;
+    /** 金色四角边框宽度 */
     private static final int CORNER = 2;
 
+    /**
+     * 渲染 HUD。每帧调用，检查 hudHidden 后绘制。
+     */
     public static void render(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.options.hudHidden) return;
@@ -93,6 +110,9 @@ public class SinFragmentHUD {
         }
     }
 
+    /**
+     * 绘制选中罪孽的金色四角高亮边框。
+     */
     private static void drawGoldCorners(DrawContext ctx, int x, int y) {
         int color = 0xFFFFD866;
         int s = ICON_SIZE;
@@ -106,6 +126,11 @@ public class SinFragmentHUD {
         ctx.fill(x + s, y + s - CORNER, x + s + 1, y + s + 1, color);
     }
 
+    /**
+     * 绘制罪孽图标，透明度随碎片数量线性增长。
+     *
+     * @param alpha 透明度 = 0.5 + min(0.5, count/1000)，范围 [0.5, 1.0]
+     */
     private static void drawIcon(DrawContext context, Identifier tex, int x, int y, int count) {
         float alpha = 0.5f + Math.min(0.5f, count / 1000.0f);
         RenderSystem.setShaderTexture(0, tex);

@@ -77,5 +77,8 @@
   "cmd.attack_type.frag_kill": " [即死]",
   "cmd.attack_type.frag_active": "激活罪孽: %s L%d",
   "cmd.attack_type.frag_add_ok": "已为 %s 添加 %d 个 %s 碎片（当前: %d）",
-  "cmd.attack_type.frag_set_ok": "已将 %s 的 %s 碎片设为 %d"
+  "cmd.attack_type.frag_set_ok": "已将 %s 的 %s 碎片设为 %d",
+  "cmd.attack_type.total_product_decay": "罪孽深重！总积降至 %.1f",
+  "cmd.attack_type.test_spawned": "已生成 %d 只测试狗",
+  "cmd.attack_type.test_dog_name": "测试狗 #%d"
 }

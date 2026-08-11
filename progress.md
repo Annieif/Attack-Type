@@ -111,3 +111,119 @@
   6. 标记 SinFragmentConfig 为预留代码（未被任何代码引用）
 - 一致性验证：枚举↔语言文件✓ 伤害公式✓ 网络包✓ 附魔等级✓ 配置文件✓
 - 构建: **BUILD SUCCESSFUL**
+
+## 会话 3: 2026-08-11
+
+### 阶段28: 函数级注释 + 代码审计 + 规则汇总 + README重写（完成）
+
+**函数级注释（23个Java文件）：**
+- 为所有类、方法、字段添加统一风格的 Javadoc 注释
+- 核心 API 文件（AttackType、SinType、ResistanceProfile、AttackTypeMapper）：详细说明枚举值、判定规则、算法流程
+- Mixin 注入文件（MixinLivingEntity）：说明 ThreadLocal 缓存机制、注入点职责、伤害公式
+- 附魔文件（SinEnchantment、PhysicalResistanceEnchantment、ModEnchantments）：说明附魔属性、触发机制
+- 碎片系统（SinFragmentData、SinFragmentManager、SinFragmentConfig、ClientFragmentCache）：说明常量、阈值、触发逻辑
+- 抗性管理（ResistanceManager）：说明衰减算法、ConcurrentHashMap 线程安全
+- 网络通信（ModPackets、NetworkHandler、NetworkHandlerClient、ClientResistanceCache）：说明包方向、数据格式
+- 客户端（Attack_typeClient、Attack_typeDataGenerator）：说明按键绑定、触发窗口机制
+- 命令（ResistanceCommand）：说明所有子命令及参数
+- GUI（ResistanceScreen、SinFragmentHUD）：说明布局、渲染逻辑、状态显示
+
+**代码审计：**
+- 发现 `ResistanceProfile.getResistanceLabel()` 缺失 → **已修复**：添加了基于抗性值返回等级标签键的方法（3个重载）
+- 发现 `SinFragmentConfig` 与 `SinFragmentData` 常量重复 → 待清理
+- 发现 `Attack_typeDataGenerator` 为空实现 → 已标记
+- 验证一致性：语言文件 ↔ 枚举值 ✓，伤害公式 ↔ 代码实现 ✓，常量值 ↔ 文档描述 ✓
+
+**规则汇总（24条）：**
+- 攻击类型判定规则（3条）
+- 罪孽触发规则（3条）
+- 伤害计算规则（4条）
+- 抗性管理规则（5条）
+- 碎片管理规则（4条）
+- 附魔规则（2条）
+- 网络规则（3条）
+
+**README 重写：**
+- 全新结构：核心概念 → 伤害计算 → 碎片系统 → 生物触发 → 抗性衰减 → 附魔 → 按键 → HUD → GUI → 指令 → 架构 → 网络 → 技术要点 → 构建 → 规则汇总 → 审计结果
+- 修正伤害公式表述（明确 applyDamage 包裹关系）
+- 添加碎片获取途径表
+- 添加激活持续时间表
+- 添加完整规则汇总
+- 添加代码审计结果章节
+
+## 会话 4: 2026-08-11
+
+### 阶段29: 罪孽颜色修正 + 配置化数据采集 + 生成配置文件（完成）
+
+**颜色修正：**
+- 更新 README.md 罪孽属性颜色表，对齐图标实际颜色：
+  - 暴怒(红) / 色欲(橙) / 怠惰(黄) / 暴食(草绿) / 忧郁(天蓝) / 傲慢(深蓝) / 嫉妒(紫)
+- 同步更新 SinType.java Javadoc 注释中的颜色描述
+
+**数据采集（跨 10 个源文件）：**
+- SinType.java — 枚举定义 + 颜色注释 + 翻译键方法
+- SinFragmentData.java — 碎片消耗(40/70/100)、阈值(500/1000)、持续(80/140/200 ticks)
+- SinFragmentConfig.java — 碎片获取量(5/20/1/1)
+- SinFragmentHUD.java — 7 个图标纹理 ID + HUD 渲染颜色常量
+- SinFragmentManager.java — 附魔减耗公式 max(1, base-2*level)
+- SinEnchantment.java — 附魔属性(RARE/L5/MAINHAND/权重)
+- ModEnchantments.java — 7 个罪孽附魔注册
+- AttackTypeMapper.java — 非玩家掷骰率(5%+10%/lv, L1~3)
+- zh_cn.json / en_us.json — 翻译键全覆盖
+
+**生成配置文件：**
+- 创建 `src/main/resources/assets/attack_type/sin_types.json`
+- 包含 7 个罪孽的完整属性（名称/颜色/图标/附魔参数）
+- 碎片系统参数（消耗/阈值/持续/获取量/减耗）
+- 非玩家生物触发参数（概率/等级范围/种子公式）
+- HUD 渲染参数（颜色/透明度/位置/尺寸）
+- 附魔系统默认参数（sin + physicalResistance）
+- 伤害公式参考
+
+## 会话 5: 2026-08-11
+
+### 阶段30: 罪孽碎片获取系统 + 粒子效果 + QoL（完成）
+
+**实现内容：**
+
+1. **SinFragmentAcquisition.java** — 7种罪孽碎片获取系统
+   - 暴怒：`ServerLivingEntityEvents.AFTER_DEATH` 追踪连杀间隔（≤1s +7, ≤2s +5, ≤5s +3, ≤10s +1）
+   - 色欲：`UseItemCallback` 鸡蛋+1；`MixinAnimalEntity.breed()` 繁殖+1；`MixinZombieVillagerEntity.finishConversion()` 治愈+10；`MixinLightningStrike.onStruckByLightning()` 闪电变异+10；`MixinZombieEntity.convertTo(DROWNED)` 溺尸+5
+   - 怠惰：`ServerTickEvents.END_SERVER_TICK` AFK检测（不跑不跳+在地面，每分钟+1）；`MixinServerPlayerEntity.wakeUp()` 睡眠完成+5
+   - 暴食：`UseItemCallback` 进食+1；`MixinPlayerEntity.canConsume()` 允许满饱食度进食
+   - 忧郁：`ALLOW_DAMAGE` 玩家受伤（每点+1）+ 目击非玩家造成的生物受伤（每点+1）
+   - 傲慢：`MixinPlayerAdvancementTracker.grantCriterion()` 成就+10；`ServerTickEvents` 累计制作27组+1；`onProduction()` 烧炼/酿造/附魔+2
+   - 嫉妒：`ServerTickEvents` 每分钟比较装备等级（下界合金6>钻石5>金4>铁3>石头2>木1>无0，附魔+10）；`notifySinAttackWitnessed()` 目击罪孽攻击+1
+
+2. **Mixin 注入（8个文件）：**
+   - `MixinLightningStrike` — 目标 `Entity.class`，注入 `onStruckByLightning`
+   - `MixinPlayerEntity` — 目标 `PlayerEntity.class`，注入 `canConsume` 始终返回 true
+   - `MixinServerPlayerEntity` — 目标 `ServerPlayerEntity.class`，注入 `trySleep`（绕过时间检查）+ `wakeUp`（睡眠完成检测）
+   - `MixinAnimalEntity` — 目标 `AnimalEntity.class`，注入 `breed`
+   - `MixinZombieVillagerEntity` — 目标 `ZombieVillagerEntity.class`，注入 `finishConversion`
+   - `MixinZombieEntity` — 目标 `ZombieEntity.class`，注入 `convertTo`
+   - `MixinPlayerAdvancementTracker` — 目标 `PlayerAdvancementTracker.class`，注入 `grantCriterion`
+   - `MixinLivingEntity` — 添加 `spawnSinParticles()` 粒子效果 + `notifySinAttackWitnessed()` 调用
+
+3. **粒子效果：** 7种罪孽各使用不同颜色的 `DustParticleEffect`（红/橙/黄/草绿/天蓝/深蓝/紫），在目标实体周围生成12个粒子
+
+**编译错误修复：**
+- `ServerLivingEntityEvents.AFTER_DAMAGE` 不存在 → 改用 `ALLOW_DAMAGE`
+- `player.jumping` 是 protected → 改用 `player.isOnGround()`
+- `MixinLightningStrike` 目标 `LivingEntity.class` → 改为 `Entity.class`（`onStruckByLightning` 定义在 Entity 中）
+- `Stats.CRAFTED` 不可迭代 → 改用 `Registries.ITEM` 遍历
+- `SwordItem` 引用冗余 → 移除（`SwordItem extends ToolItem`，已被 ToolItem 捕获）
+- `AFTER_RESPAWN` 用于睡眠检测不正确 → 改用 `MixinServerPlayerEntity.wakeUp()` 注入
+- 清理未使用的 import（ServerPlayerEvents, LightningEntity, StatusEffects, ZombieEntity, ZombieVillagerEntity, Stat, StatType, Identifier）
+
+**构建结果：** BUILD SUCCESSFUL（2次验证）
+
+**待完成：** 30j — sin_types.json 配置更新（加入新碎片获取参数）
+
+### 30j: sin_types.json 配置更新（完成）
+- 新增 `fragmentAcquisition` 章节：7种罪孽独立碎片获取规则（含来源、数量、条件）
+- 新增 `particleEffects` 章节：粒子类型、颜色 RGB 值、数量、扩散半径
+- 新增 `qolFeatures` 章节：反复进食/反复睡觉开关及描述
+- 构建: **BUILD SUCCESSFUL**
+
+**阶段30 全部完成！**

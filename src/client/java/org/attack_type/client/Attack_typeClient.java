@@ -20,14 +20,30 @@ import org.attack_type.network.NetworkHandlerClient;
 import org.attack_type.network.ModPackets;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * 客户端模组入口。
+ * <p>
+ * 注册按键绑定、HUD 渲染、网络包接收器和连接事件：
+ * <ul>
+ *   <li><b>U 键</b> — 打开抗性配置 GUI</li>
+ *   <li><b>[ 键</b> — 向左切换激活罪孽</li>
+ *   <li><b>] 键</b> — 向右切换激活罪孽</li>
+ *   <li><b>\ 键</b> — 触发罪孽（连按 1~3 次选择 L1~L3）</li>
+ * </ul>
+ * <p>
+ * 罪孽触发采用 20 tick 窗口缓冲：连按 N 次触发 Lv.N，超时后发送网络包。
+ */
 public class Attack_typeClient implements ClientModInitializer {
     private static KeyBinding resistanceKey;
     private static KeyBinding sinLeftKey;
     private static KeyBinding sinRightKey;
     private static KeyBinding sinTriggerKey;
 
+    /** 触发键连按计数（1~3） */
     private static int triggerPressCount = 0;
+    /** 触发窗口倒计时 */
     private static int triggerTimer = 0;
+    /** 触发窗口长度（tick），连按窗口为 20 tick = 1 秒 */
     private static final int TRIGGER_WINDOW = 20;
 
     @Override
@@ -98,6 +114,11 @@ public class Attack_typeClient implements ClientModInitializer {
         NetworkHandlerClient.registerClient();
     }
 
+    /**
+     * 循环切换激活罪孽类型。
+     *
+     * @param direction -1 向左，+1 向右
+     */
     private static void cycleActiveSin(int direction) {
         SinType[] types = SinType.values();
         SinType current = ClientFragmentCache.getActiveSinType();
@@ -113,6 +134,9 @@ public class Attack_typeClient implements ClientModInitializer {
         showCycleMessage();
     }
 
+    /**
+     * 在 action bar 显示当前激活的罪孽名称。
+     */
     private static void showCycleMessage() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -124,6 +148,11 @@ public class Attack_typeClient implements ClientModInitializer {
         }
     }
 
+    /**
+     * 发送罪孽触发网络包到服务端。
+     *
+     * @param level 触发等级（1~3）
+     */
     private static void sendTriggerPacket(int level) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(ClientFragmentCache.getActiveSinType().ordinal());

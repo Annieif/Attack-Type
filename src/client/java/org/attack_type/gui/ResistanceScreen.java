@@ -17,6 +17,15 @@ import org.attack_type.network.ModPackets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 抗性配置 GUI。
+ * <p>
+ * 打开后显示 3 种物理攻击类型 + 7 种罪孽属性的当前抗性值，
+ * 可编辑每个抗性值（范围 0.00~5.00），点击 Apply 发送到服务端。
+ * 底部显示全部抗性乘积，验证是否 ≥1.0。
+ * <p>
+ * 打开方式：按 U 键。
+ */
 public class ResistanceScreen extends Screen {
     private ResistanceProfile profile;
     private final List<TextFieldWidget> physicalFields = new ArrayList<>();
@@ -27,8 +36,12 @@ public class ResistanceScreen extends Screen {
     private static final int LABEL_W = 64;
     private static final int ROW_H = 18;
     private static final int SECTION_GAP = 8;
+    /** 抗性值上限 */
     private static final float CLAMP_MAX = 5.0f;
 
+    /**
+     * 创建抗性配置 GUI，从 {@link ClientResistanceCache} 加载当前配置。
+     */
     public ResistanceScreen() {
         super(Text.translatable("screen.attack_type.resistance"));
         this.profile = new ResistanceProfile();
@@ -79,11 +92,17 @@ public class ResistanceScreen extends Screen {
                 .dimensions(centerX - 50, y, 100, 20).build());
     }
 
+    /**
+     * @return 排除 NONE 的物理攻击类型数组
+     */
     private AttackType[] getAttackTypes() {
         return java.util.Arrays.stream(AttackType.values())
                 .filter(t -> t != AttackType.NONE).toArray(AttackType[]::new);
     }
 
+    /**
+     * 裁剪抗性值到 [0, CLAMP_MAX] 范围并保留两位小数。
+     */
     private float clamp(float v) {
         if (v < 0f) return 0f;
         if (v > CLAMP_MAX) return CLAMP_MAX;
@@ -107,6 +126,9 @@ public class ResistanceScreen extends Screen {
         }
     }
 
+    /**
+     * 收集输入并发送抗性更新包到服务端。
+     */
     private void applyChanges() {
         collectInputs();
         ClientResistanceCache.setProfile(profile);
@@ -231,6 +253,9 @@ public class ResistanceScreen extends Screen {
     @Override
     public boolean shouldPause() { return false; }
 
+    /**
+     * 深拷贝抗性配置。
+     */
     private static void copyProfile(ResistanceProfile from, ResistanceProfile to) {
         for (AttackType type : AttackType.values())
             if (type != AttackType.NONE) to.setPhysicalResistance(type, from.getPhysicalResistance(type));

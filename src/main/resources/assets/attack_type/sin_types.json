@@ -1,0 +1,311 @@
+{
+  "_comment": "Attack Type Mod — 罪孽属性配置文件",
+  "_description": "此文件汇总所有罪孽属性的可配置参数。修改后需重启游戏生效。",
+
+  "sinTypes": {
+    "WRATH": {
+      "name_zh": "暴怒",
+      "name_en": "Wrath",
+      "color": "红",
+      "colorHex": "#FF4444",
+      "ordinal": 0,
+      "icon": "textures/gui/sin_fragment/wrath.png",
+      "enchantment": {
+        "id": "attack_type:wrath",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带暴怒罪孽伤害",
+        "description_en": "Adds Wrath sin damage to attacks"
+      }
+    },
+    "LUST": {
+      "name_zh": "色欲",
+      "name_en": "Lust",
+      "color": "橙",
+      "colorHex": "#FF8800",
+      "ordinal": 1,
+      "icon": "textures/gui/sin_fragment/lust.png",
+      "enchantment": {
+        "id": "attack_type:lust",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带色欲罪孽伤害",
+        "description_en": "Adds Lust sin damage to attacks"
+      }
+    },
+    "SLOTH": {
+      "name_zh": "怠惰",
+      "name_en": "Sloth",
+      "color": "黄",
+      "colorHex": "#FFDD00",
+      "ordinal": 2,
+      "icon": "textures/gui/sin_fragment/sloth.png",
+      "enchantment": {
+        "id": "attack_type:sloth",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带怠惰罪孽伤害",
+        "description_en": "Adds Sloth sin damage to attacks"
+      }
+    },
+    "GLUTTONY": {
+      "name_zh": "暴食",
+      "name_en": "Gluttony",
+      "color": "草绿",
+      "colorHex": "#44CC44",
+      "ordinal": 3,
+      "icon": "textures/gui/sin_fragment/gluttony.png",
+      "enchantment": {
+        "id": "attack_type:gluttony",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带暴食罪孽伤害",
+        "description_en": "Adds Gluttony sin damage to attacks"
+      }
+    },
+    "GLOOM": {
+      "name_zh": "忧郁",
+      "name_en": "Gloom",
+      "color": "天蓝",
+      "colorHex": "#44BBFF",
+      "ordinal": 4,
+      "icon": "textures/gui/sin_fragment/gloom.png",
+      "enchantment": {
+        "id": "attack_type:gloom",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带忧郁罪孽伤害",
+        "description_en": "Adds Gloom sin damage to attacks"
+      }
+    },
+    "PRIDE": {
+      "name_zh": "傲慢",
+      "name_en": "Pride",
+      "color": "深蓝",
+      "colorHex": "#2244CC",
+      "ordinal": 5,
+      "icon": "textures/gui/sin_fragment/pride.png",
+      "enchantment": {
+        "id": "attack_type:pride",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带傲慢罪孽伤害",
+        "description_en": "Adds Pride sin damage to attacks"
+      }
+    },
+    "ENVY": {
+      "name_zh": "嫉妒",
+      "name_en": "Envy",
+      "color": "紫",
+      "colorHex": "#AA44FF",
+      "ordinal": 6,
+      "icon": "textures/gui/sin_fragment/envy.png",
+      "enchantment": {
+        "id": "attack_type:envy",
+        "rarity": "RARE",
+        "maxLevel": 5,
+        "slot": "MAINHAND",
+        "minPowerBase": 1,
+        "minPowerPerLevel": 10,
+        "description_zh": "攻击附带嫉妒罪孽伤害",
+        "description_en": "Adds Envy sin damage to attacks"
+      }
+    }
+  },
+
+  "fragmentSystem": {
+    "_comment": "罪孽碎片系统 — 数值参数（与 SinFragmentData.java 一致）",
+    "costPerLevel": {
+      "L1": 40,
+      "L2": 70,
+      "L3": 100
+    },
+    "thresholds": {
+      "overflow": 500,
+      "kill": 1000
+    },
+    "durationTicks": {
+      "L1": 80,
+      "L2": 140,
+      "L3": 200
+    },
+    "durationSeconds": {
+      "L1": 4,
+      "L2": 7,
+      "L3": 10
+    },
+    "fragmentGain": {
+      "damageTaken": 1,
+      "damageDealt": 1,
+      "mobKill": 5,
+      "playerKill": 20
+    },
+    "enchantmentCostReduction": {
+      "_comment": "附魔减耗：实际消耗 = max(1, baseCost - reductionPerLevel × enchantLevel)",
+      "reductionPerLevel": 2,
+      "minimumCost": 1
+    }
+  },
+
+  "mobSinTrigger": {
+    "_comment": "非玩家生物罪孽触发 — 随机掷骰参数（与 AttackTypeMapper.java 一致）",
+    "baseChancePercent": 5,
+    "chancePerEnchantLevelPercent": 10,
+    "levelRange": {
+      "min": 1,
+      "max": 3
+    },
+    "levelFormula": "random in [max(1, enchantLevel), min(3, enchantLevel+1)]",
+    "seedFormula": "UUID LSB ^ worldTime ^ coordinate hash"
+  },
+
+  "hudConfig": {
+    "_comment": "SinFragmentHUD.java 渲染参数",
+    "iconSize": 32,
+    "padding": 3,
+    "cornerWidth": 2,
+    "goldCornerColor": "0xFFFFD866",
+    "overflowBorderColor": "0x99DD5500",
+    "killBorderColor": "0xBBDD0000",
+    "levelLabelColor": "0xFFEE77",
+    "textColors": {
+      "normal": "0xFFFFFF",
+      "zero": "0x999999",
+      "overflow": "0xFFBB44",
+      "kill": "0xFF6666"
+    },
+    "alphaRange": {
+      "min": 0.5,
+      "max": 1.0,
+      "formula": "0.5 + min(0.5, count / 1000)"
+    },
+    "position": {
+      "x": 4,
+      "y": 4
+    }
+  },
+
+  "enchantmentDefaults": {
+    "_comment": "附魔系统通用参数（与 SinEnchantment.java / PhysicalResistanceEnchantment.java 一致）",
+    "sin": {
+      "rarity": "RARE",
+      "maxLevel": 5,
+      "target": "BREAKABLE",
+      "slot": "MAINHAND",
+      "minPower": "1 + (level-1) × 10",
+      "maxPower": "minPower + 15",
+      "acceptableItem": "any",
+      "availableForBookOffer": true,
+      "availableForRandomSelection": true
+    },
+    "physicalResistance": {
+      "rarity": "RARE",
+      "maxLevel": 4,
+      "slot": "ARMOR (HEAD,CHEST,LEGS,FEET)",
+      "minPower": "1 + (level-1) × 8",
+      "maxPower": "minPower + 15",
+      "damageReductionFormula": "per armor piece: 1 - 0.05 × level, all 4 pieces multiplied"
+    }
+  },
+
+  "fragmentAcquisition": {
+    "_comment": "7种罪孽独立碎片获取规则（与 SinFragmentAcquisition.java 一致）",
+    "WRATH": {
+      "_comment": "暴怒 — 连杀追踪",
+      "method": "ServerLivingEntityEvents.AFTER_DEATH 追踪两次击杀间隔",
+      "bonuses": {
+        "within1s": 7,
+        "within2s": 5,
+        "within5s": 3,
+        "within10s": 1
+      }
+    },
+    "LUST": {
+      "_comment": "色欲 — 繁殖与变异",
+      "breed": { "amount": 1, "source": "MixinAnimalEntity.breed()" },
+      "eggThrow": { "amount": 1, "source": "UseItemCallback (Items.EGG)" },
+      "cureZombieVillager": { "amount": 10, "source": "MixinZombieVillagerEntity.finishConversion()" },
+      "lightningTransform": { "amount": 10, "source": "MixinLightningStrike.onStruckByLightning()", "targets": ["PigEntity", "CreeperEntity", "MooshroomEntity", "VillagerEntity"] },
+      "zombieToDrowned": { "amount": 5, "source": "MixinZombieEntity.convertTo(DROWNED)" }
+    },
+    "SLOTH": {
+      "_comment": "怠惰 — 静止与睡眠",
+      "afkIntervalTicks": 1200,
+      "afkIntervalSeconds": 60,
+      "afkAmount": 1,
+      "afkCondition": "不跑 + 不跳 + 在地面 + 位置不变",
+      "sleepComplete": { "amount": 5, "source": "MixinServerPlayerEntity.wakeUp()" },
+      "alwaysSleep": { "enabled": true, "source": "MixinServerPlayerEntity.trySleep() 绕过时间检查" }
+    },
+    "GLUTTONY": {
+      "_comment": "暴食 — 进食",
+      "eatAmount": 1,
+      "source": "UseItemCallback (stack.isFood())",
+      "alwaysEat": { "enabled": true, "source": "MixinPlayerEntity.canConsume() 始终返回 true" }
+    },
+    "GLOOM": {
+      "_comment": "忧郁 — 受伤与目击",
+      "selfDamage": { "amountPerPoint": 1, "source": "ServerLivingEntityEvents.ALLOW_DAMAGE (entity == player)" },
+      "witnessDamage": { "amountPerPoint": 1, "source": "ServerLivingEntityEvents.ALLOW_DAMAGE (entity != player, attacker != player)", "range": 32 }
+    },
+    "PRIDE": {
+      "_comment": "傲慢 — 成就与生产",
+      "advancement": { "amount": 10, "source": "MixinPlayerAdvancementTracker.grantCriterion()" },
+      "crafting": { "amount": 1, "threshold": "27组 (1728个)", "source": "ServerTickEvents + Registries.ITEM 遍历 Stats.CRAFTED" },
+      "production": { "amount": 2, "source": "onProduction() — 烧炼/酿造/附魔" }
+    },
+    "ENVY": {
+      "_comment": "嫉妒 — 攀比与目击",
+      "equipmentCompare": { "amount": 2, "intervalTicks": 1200, "intervalSeconds": 60, "range": 16, "tiers": { "netherite": 6, "diamond": 5, "gold": 4, "iron": 3, "stone": 2, "wood": 1, "other": 0 }, "enchantedBonus": 10, "source": "ServerTickEvents 每分钟比较装备/武器等级" },
+      "witnessSinAttack": { "amount": 1, "range": 16, "source": "MixinLivingEntity 罪孽伤害计算时调用 notifySinAttackWitnessed()" }
+    }
+  },
+
+  "particleEffects": {
+    "_comment": "罪孽攻击粒子效果（与 MixinLivingEntity.spawnSinParticles() 一致）",
+    "type": "DustParticleEffect (RGB 粉尘粒子)",
+    "count": 12,
+    "spreadRadius": 0.8,
+    "size": 1.0,
+    "colors": {
+      "WRATH":    { "r": 1.0, "g": 0.2, "b": 0.2, "name": "红" },
+      "LUST":     { "r": 1.0, "g": 0.5, "b": 0.0, "name": "橙" },
+      "SLOTH":    { "r": 1.0, "g": 0.9, "b": 0.1, "name": "黄" },
+      "GLUTTONY": { "r": 0.2, "g": 0.8, "b": 0.2, "name": "草绿" },
+      "GLOOM":    { "r": 0.2, "g": 0.7, "b": 1.0, "name": "天蓝" },
+      "PRIDE":    { "r": 0.1, "g": 0.2, "b": 0.8, "name": "深蓝" },
+      "ENVY":     { "r": 0.6, "g": 0.2, "b": 1.0, "name": "紫" }
+    }
+  },
+
+  "qolFeatures": {
+    "_comment": "QoL 特性开关",
+    "alwaysEat": { "enabled": true, "source": "MixinPlayerEntity.canConsume()", "description": "满饱食度也可进食" },
+    "alwaysSleep": { "enabled": true, "source": "MixinServerPlayerEntity.trySleep()", "description": "白天也可睡觉，可反复睡" }
+  },
+
+  "damageFormula": {
+    "_comment": "伤害计算公式（与 MixinLivingEntity.java 一致）",
+    "formula": "applyDamage(amount × physMult) + sinDamage",
+    "physMult": "physicalResistance × Π(1 - 0.05 × armorEnchantLevel)",
+    "sinDamage": "(sinLevel × 3 + 1) × sinResistance"
+  }
+}

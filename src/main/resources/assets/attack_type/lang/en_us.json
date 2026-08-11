@@ -77,5 +77,8 @@
   "cmd.attack_type.frag_kill": " [KILL]",
   "cmd.attack_type.frag_active": "Active Sin: %s L%d",
   "cmd.attack_type.frag_add_ok": "Added %d %s fragments to %s (now: %d)",
-  "cmd.attack_type.frag_set_ok": "Set %s fragments to %d for %s"
+  "cmd.attack_type.frag_set_ok": "Set %s fragments to %d for %s",
+  "cmd.attack_type.total_product_decay": "Sin overwhelms! Total product decayed to %.1f",
+  "cmd.attack_type.test_spawned": "Spawned %d test dogs",
+  "cmd.attack_type.test_dog_name": "Test Dog #%d"
 }
