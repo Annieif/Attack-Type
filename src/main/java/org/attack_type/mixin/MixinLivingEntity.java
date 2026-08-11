@@ -73,22 +73,14 @@ public abstract class MixinLivingEntity {
 
     @ModifyArg(method = "damage",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F"),
-            index = 1)
-    private float modifyArmorDamageArg(float amount) {
-        Float mult = PENDING_PHYS_MULT.get();
-        return amount * (mult != null ? mult : 1.0f);
-    }
-
-    @ModifyArg(method = "damage",
-            at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"),
             index = 1)
     private float addSinDamageToFinal(float amount) {
+        Float mult = PENDING_PHYS_MULT.get();
         Float sinDamage = PENDING_SIN_DAMAGE.get();
         PENDING_SIN_DAMAGE.remove();
         PENDING_PHYS_MULT.remove();
-        return amount + (sinDamage != null ? sinDamage : 0.0f);
+        return amount * (mult != null ? mult : 1.0f) + (sinDamage != null ? sinDamage : 0.0f);
     }
 
     @Unique
