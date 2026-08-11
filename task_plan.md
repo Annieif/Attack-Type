@@ -33,6 +33,7 @@
 | 23 | 文本国际化         | ✅ completed    | 所有硬编码改为翻译键，zh_cn.json + en_us.json 全覆盖     |
 | 24 | ResistanceScreen UI 修复 | ✅ completed    | 单列布局、删除输入框阴影、数值越界提示、修复标签错位 |
 | 25 | 其他生物罪孽触发 | ✅ completed | 非玩家生物: 5%基础随机触发(等级1~3)+附魔类型&等级加成 |
+| 26 | README 更新与 Git 提交 | ✅ completed | 文档：碎片系统+键位+指令+怪物随机触发，提交 commit |
 
 ## 伤害公式
 

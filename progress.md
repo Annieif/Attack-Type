@@ -84,3 +84,18 @@
 - 构建验证：**BUILD SUCCESSFUL**
 
 **Git 提交待执行（用户要求 use git）。**
+
+- Commit `91ababf`: i18n all strings + fix ResistanceScreen UI (single column, no shadow, >5 overflow indicator) — 9 files changed, +257 -104
+
+### 阶段25: 其他生物罪孽随机触发（完成）
+- AttackTypeMapper.getSinType() / getSinLevel() 非玩家分支 → rollMobSin()
+- 7 种罪孽各独立掷骰：基础 5%，每级对应附魔 +10% 触发率
+- 等级 1~3 随机：无附魔均等 1-3；有附魔时 minLevel=enchantLevel(cap3), maxLevel=enchantLevel+1
+- ThreadLocal MOB_SIN_CACHE 保证同一攻击 getSinType 与 getSinLevel 一致；MixinLivingEntity.addSinDamageToFinal 后 clearMobSinCache
+- 构建: **BUILD SUCCESSFUL**
+- Commit `78ce81b`: Mob sin trigger: non-player mobs get 5% base random sin 1-3 — 3 files changed, +92 -27
+
+### 阶段26: README 更新与 Git 提交（完成）
+- README 重写：新增玩家罪孽碎片系统（HUD/阈值500溢/1000死/[ ] \键位）、其他生物随机罪孽（5%+10%/lv）、完整键位表、碎片指令、fragment 包与网络包、单列 UI 修复、i18n 说明
+- 构建: **BUILD SUCCESSFUL**
+- 待 Git commit

@@ -1,6 +1,6 @@
 # Attack Type Mod
 
-Minecraft Fabric 1.20.1 模组，实现"攻击类型"和"罪孽属性"伤害系统。所有攻击具有物理类型（斩击/突刺/打击）和罪孽属性（七大罪），每个实体拥有可变的抗性配置。
+Minecraft Fabric 1.20.1 模组，实现「攻击类型」和「罪孽属性」伤害系统。所有攻击具有物理类型（斩击/突刺/打击）和罪孽属性（七大罪），每个实体拥有可变的抗性配置；玩家额外拥有罪孽碎片系统，可积累/消耗碎片主动触发高强度罪孽伤害。
 
 ## 伤害系统规则
 
@@ -17,7 +17,41 @@ Minecraft Fabric 1.20.1 模组，实现"攻击类型"和"罪孽属性"伤害系�
 
 ### 罪孽属性
 
-七种罪孽附魔：暴怒(WRATH)、色欲(LUST)、怠惰(SLOTH)、暴食(GLUTTONY)、忧郁(GLOOM)、傲慢(PRIDE)、嫉妒(ENVY)。最高5级，适用于所有物品。攻击默认无罪孽属性，仅通过附魔概率触发。
+七种罪孽附魔：暴怒(WRATH)、色欲(LUST)、怠惰(SLOTH)、暴食(GLUTTONY)、忧郁(GLOOM)、傲慢(PRIDE)、嫉妒(ENVY)。最高5级，适用于所有物品。
+
+### 罪孽触发
+
+#### 玩家（碎片驱动）
+
+玩家攻击的罪孽属性由「罪孽碎片」和「激活罪孽」共同决定（不再是纯附魔概率）。
+
+- **碎片来源**：玩家受罪孽伤害时积累对应类型的碎片（对方有对应罪孽附魔 → 碎片）
+- **溢出阈值 500**：碎片 ≥500 时该类型图标显示"溢"，下一次该罪孽攻击自动触发（优先对应附魔类型）
+- **即死阈值 1000**：碎片 ≥1000 时显示"死"，直接秒杀攻击者（自反）
+- **手动触发**：按 `\` 键消耗碎片触发当前激活罪孽，消耗由等级决定：
+  - Lv.1：100 碎片；Lv.2：200 碎片；Lv.3：300 碎片
+  - 武器拥有对应罪孽附魔时：每 1 附魔级减少 10% 消耗
+- **激活罪孽切换**：按 `[` / `]` 键切换当前激活的罪孽类型（HUD 图标高亮）
+
+#### 其他生物（随机 + 附魔加成）
+
+非玩家 LivingEntity（僵尸、骷髅、监守者…）不使用碎片，改为每次攻击独立掷骰：
+
+```
+对 7 种罪孽各掷一次：
+
+触发率 = 5% + 附魔等级 × 10%
+等级   = 范围 [max(1, 附魔), min(3, 附魔+1)] 内随机
+```
+
+示例：
+| 场景 | 暴怒触发率 | 等级范围 |
+|------|-----------|---------|
+| 僵尸空手 | 5% | 1 ~ 3 |
+| 僵尸持有「暴怒 II 剑」 | 5+20 = 25% | 2 ~ 3 |
+| 掠夺者持有「怠惰 IV 弩」 | 5+40 = 45% | 3（clamp） |
+
+伤害生效前缓存（ThreadLocal）保证本次攻击的「罪孽类型 / 等级」配对一致。
 
 ### 物理抗性
 
@@ -43,7 +77,7 @@ Minecraft Fabric 1.20.1 模组，实现"攻击类型"和"罪孽属性"伤害系�
 ```
 
 - 罪孽伤害强行扣除，不受物理减伤影响
-- 单次攻击只取等级最高的罪孽属性
+- 单次攻击只取 1 种罪孽（碎片/随机中选中的）
 
 ### 抗性系统
 
@@ -51,6 +85,34 @@ Minecraft Fabric 1.20.1 模组，实现"攻击类型"和"罪孽属性"伤害系�
 - 每 2 天（48000 ticks）随机重分配（玩家除外）
 - 每 4 个周期总积减少 0.01
 - 玩家通过 U 键打开 GUI 手动分配抗性，总积保持不变
+- GUI 数值 clamp 在 [0, 5.0]，越界输入框边框变红并附加红色 `>` / `<` 标记
+
+---
+
+## 罪孽碎片 HUD
+
+屏幕上方渲染 7 个带边框的 32×32 罪孽图标（按 Wrath/Lust/Sloth/Gluttony/Gloom/Pride/Envy 顺序），图标中心显示当前数量：
+
+| 数量 | 显示 | 颜色 |
+|------|------|------|
+| 0 | 0 | 灰 0x999999 |
+| 1~499 | 实际数字 | 白 0xFFFFFF |
+| 500~999 | "溢" | 橙 0xFFBB44 |
+| ≥1000 | "死" | 红 0xFF6666 |
+
+- 激活罪孽（`[` / `]` 选择）：图标金色四角边框高亮
+- 溢出/即死：图标外圈对应颜色粗边框
+
+---
+
+## 按键操作
+
+| 按键 | 功能 |
+|------|------|
+| **U** | 打开/关闭抗性分配 GUI（ResistanceScreen） |
+| **[** | 切换激活罪孽：向左切换（Envy → Pride → … → Wrath） |
+| **]** | 切换激活罪孽：向右切换（Wrath → Lust → … → Envy） |
+| **\\** | 触发激活罪孽攻击（按激活等级消耗对应碎片） |
 
 ---
 
@@ -59,45 +121,64 @@ Minecraft Fabric 1.20.1 模组，实现"攻击类型"和"罪孽属性"伤害系�
 ```
 src/
 ├── client/java/org/attack_type/
-│   ├── client/Attack_typeClient.java    # 客户端入口
-│   ├── gui/ResistanceScreen.java        # 抗性分配 GUI
+│   ├── client/Attack_typeClient.java       # 客户端入口：键位注册 + 网络
+│   ├── gui/
+│   │   ├── ResistanceScreen.java           # 抗性分配 GUI（单列、无阴影、越界提示）
+│   │   └── SinFragmentHUD.java             # 7 个罪孽图标 HUD（碎片数量 + 状态边）
 │   └── network/
-│       ├── ClientResistanceCache.java   # 客户端抗性缓存
-│       └── NetworkHandlerClient.java    # 客户端网络注册
+│       ├── ClientResistanceCache.java
+│       ├── ClientFragmentCache.java        # 客户端激活罪孽缓存
+│       └── NetworkHandlerClient.java       # 收 RESISTANCE_SYNC / FRAGMENT_SYNC
 ├── main/java/org/attack_type/
-│   ├── Attack_type.java                 # 主入口 ModInitializer
+│   ├── Attack_type.java
 │   ├── api/
-│   │   ├── AttackType.java              # 攻击类型枚举
-│   │   ├── AttackTypeMapper.java        # 攻击类型/罪孽映射
-│   │   ├── ResistanceProfile.java       # 抗性数据模型
-│   │   └── SinType.java                 # 罪孽属性枚举
-│   ├── component/
-│   │   └── ResistanceManager.java       # 实体抗性管理
+│   │   ├── AttackType.java                 # SLASH / PIERCE / BLUNT / NONE
+│   │   ├── AttackTypeMapper.java           # 攻击类型 + 罪孽判定（玩家/非玩家）
+│   │   ├── ResistanceProfile.java          # 3物理+7罪孽 抗性 + totalProduct
+│   │   └── SinType.java                    # WRATH…ENVY 七大罪
+│   ├── component/ResistanceManager.java    # 实体抗性周期更新
 │   ├── enchantment/
-│   │   ├── ModEnchantments.java         # 附魔注册
+│   │   ├── ModEnchantments.java            # 7罪孽 + 3物理抗性
 │   │   ├── PhysicalResistanceEnchantment.java
 │   │   └── SinEnchantment.java
-│   ├── mixin/
-│   │   └── MixinLivingEntity.java       # 伤害计算注入
-│   ├── command/
-│   │   └── ResistanceCommand.java       # OP 调试指令
+│   ├── fragment/
+│   │   ├── SinFragmentData.java            # 7种碎片计数 + 激活罪孽 (L1/L2/L3)
+│   │   ├── SinFragmentManager.java         # 碎片增删、触发、溢出即死判定
+│   │   └── SinFragmentConfig.java          # 配置：触发消耗 L1/L2/L3 + 持续
+│   ├── mixin/MixinLivingEntity.java        # damage HEAD / applyDamage ModifyArg
+│   ├── command/ResistanceCommand.java      # /attacktype get|set|reset|tick|fragment
 │   └── network/
-│       ├── ModPackets.java              # 网络包标识
-│       └── NetworkHandler.java          # 服务端网络处理
+│       ├── ModPackets.java                 # RESISTANCE_SYNC|UPDATE / FRAGMENT_SYNC|TRIGGER
+│       └── NetworkHandler.java             # 服务端收包 + 广播同步
+└── main/resources/assets/attack_type/lang/
+    ├── zh_cn.json                          # 中文：界面/指令/附魔/标签
+    └── en_us.json                          # 英文：界面/指令/附魔/标签
 ```
 
 ---
 
-## 调试指令（需 OP 权限）
+## 调试指令（需 OP 权限 / permission level 2）
+
+### 抗性
 
 | 指令 | 说明 |
 |------|------|
-| `/attacktype get [实体]` | 查看自身或指定实体的抗性值 |
-| `/attacktype set <类型> <值> [实体]` | 设置指定抗性类型值（0.0~5.0） |
+| `/attacktype get [实体]` | 查看自身或指定实体的抗性值 + Total Product |
+| `/attacktype set <类型> <值> [实体]` | 设置指定抗性类型值（0.0~5.0 clamp） |
 | `/attacktype reset [实体]` | 重置实体抗性为默认随机值 |
 | `/attacktype tick [实体]` | 强制触发一次抗性周期更新 |
 
-类型参数支持：`slash`、`pierce`、`blunt`、`wrath`、`lust`、`sloth`、`gluttony`、`gloom`、`pride`、`envy`
+### 碎片（玩家专用）
+
+| 指令 | 说明 |
+|------|------|
+| `/attacktype fragment get [玩家]` | 查看 7 种碎片数 + 激活罪孽/等级（溢出、即死标记） |
+| `/attacktype fragment add <罪孽> <数量> [玩家]` | 追加指定罪孽碎片 |
+| `/attacktype fragment set <罪孽> <数量> [玩家]` | 强制设置碎片数（可直接到 500/1000 看特效） |
+
+`<罪孽>` 枚举名大小写兼容：`wrath / lust / sloth / gluttony / gloom / pride / envy`
+
+类型参数：`slash`、`pierce`、`blunt`、`wrath`、`lust`、`sloth`、`gluttony`、`gloom`、`pride`、`envy`
 
 ---
 
@@ -105,273 +186,112 @@ src/
 
 ### 1. 核心枚举
 
-**AttackType** — 定义三种物理攻击类型 + NONE 表示无类型：
+**AttackType** — 三种物理攻击类型 + NONE：
 
 ```java
-// src/main/java/org/attack_type/api/AttackType.java
-public enum AttackType {
-    SLASH,   // 斩击：剑/斧/三叉戟近战
-    PIERCE,  // 突刺：弹射物
-    BLUNT,   // 打击：空手/其余物品
-    NONE;    // 无类型：环境伤害
-}
+public enum AttackType { SLASH, PIERCE, BLUNT, NONE; }
 ```
 
 **SinType** — 七种罪孽属性：
 
 ```java
-// src/main/java/org/attack_type/api/SinType.java
-public enum SinType {
-    WRATH,    // 暴怒
-    LUST,     // 色欲
-    SLOTH,    // 怠惰
-    GLUTTONY, // 暴食
-    GLOOM,    // 忧郁
-    PRIDE,    // 傲慢
-    ENVY;     // 嫉妒
-}
+public enum SinType { WRATH, LUST, SLOTH, GLUTTONY, GLOOM, PRIDE, ENVY; }
 ```
 
-### 2. AttackTypeMapper — 攻击分类器
+### 2. AttackTypeMapper — 攻击 & 罪孽分类器
 
-核心逻辑：根据 `DamageSource` 判定攻击类型和罪孽属性。弹射物仅箭矢和投掷三叉戟为突刺，雪球、鸡蛋等为打击。
+物理分类：弹射物仅箭矢 / 投掷三叉戟 → PIERCE，其余弹射物 → BLUNT；近战士兵/斧/三叉戟 → SLASH，其它 → BLUNT。
 
-```java
-// src/main/java/org/attack_type/api/AttackTypeMapper.java
-public static AttackType getAttackType(DamageSource source) {
-    // 弹射物：仅箭矢和投掷三叉戟为突刺，其余为打击
-    if (source.getSource() instanceof ProjectileEntity projectile) {
-        if (projectile instanceof ArrowEntity || projectile instanceof TridentEntity) {
-            return AttackType.PIERCE;
-        }
-        return AttackType.BLUNT;
-    }
-    // 近战 → 按武器判定
-    if (source.getSource() instanceof LivingEntity attacker) {
-        ItemStack weapon = attacker.getMainHandStack();
-        if (weapon.isEmpty()) return AttackType.BLUNT;
-        // 剑/斧/三叉戟 → 斩击，其余 → 打击
-        String name = weapon.getItem().toString().toLowerCase();
-        if (name.contains("sword") || name.contains("axe") || name.contains("trident"))
-            return AttackType.SLASH;
-        return AttackType.BLUNT;
-    }
-    return AttackType.NONE; // 环境伤害等
-}
-```
+罪孽判定分两条分支（**与旧版"取附魔最高级"不同**）：
 
-罪孽判定：遍历7种罪孽附魔，取等级最高的：
+- **玩家**：检查当前激活罪孽（优先碎片消耗触发）→ 若某类型溢出且可支付消耗则用该类型
+- **非玩家**：`rollMobSin()` 用 `(uuid LSB ^ world.time ^ 坐标)` 作种子对 7 种罪孽各掷 5%+10%/lv，命中且几率最大者胜出（保证 1~3 级范围内，附魔级越高等级范围上限越稳）
 
-```java
-public static SinType getSinType(LivingEntity attacker) {
-    ItemStack weapon = attacker.getMainHandStack();
-    SinType bestSin = null;
-    int bestLevel = 0;
-    for (SinType sinType : SinType.values()) {
-        Enchantment enchantment = ModEnchantments.getSinEnchantment(sinType);
-        int level = EnchantmentHelper.getLevel(enchantment, weapon);
-        if (level > bestLevel) {
-            bestLevel = level;
-            bestSin = sinType;
-        }
-    }
-    return bestSin;
-}
-```
+缓存 `ThreadLocal<MobSinResult>` 确保同一个 `damage()` 调用里 `getSinType()` + `getSinLevel()` 返回配对一致，每次伤害结束由 `MixinLivingEntity.addSinDamageToFinal` 调 `clearMobSinCache()` 清空。
 
 ### 3. ResistanceProfile — 抗性数据模型
 
-存储一个实体的所有抗性值，支持序列化、随机化、归一化。
-
 ```java
-// src/main/java/org/attack_type/api/ResistanceProfile.java
-public class ResistanceProfile {
-    private final Map<AttackType, Float> physicalResistances;  // 3种物理抗性
-    private final Map<SinType, Float> sinResistances;          // 7种罪孽抗性
-    private float totalProduct;  // 总积，初始 1.0
-    private long lastUpdateTick; // 上次更新 tick
-}
+Map<AttackType, Float> physicalResistances;   // 3种
+Map<SinType, Float> sinResistances;           // 7种
+float totalProduct;    // 乘积约束，GUI 分配后 normalize 拉回
+long lastUpdateTick;  // 用于 2 天周期检测
 ```
 
-**关键方法：**
+归一化：`ratio = pow(totalProduct / curProduct, 1/10)` 等比缩放 10 值，使乘积累永远等于 `totalProduct`。
 
-- `randomizeResistances()` — 随机打乱10个抗性值（3物理+7罪孽），保持总积不变
-- `normalize()` — 将当前10个值的乘积缩放回 `totalProduct`，确保总积约束
-- `writeNbt()` / `readNbt()` — NBT 序列化，用于网络同步和持久化
-
-归一化算法：计算当前乘积 `product`，然后用 `ratio = pow(totalProduct / product, 1/10)` 的等比缩放调整所有值。
-
-### 4. ResistanceManager — 抗性管理器
-
-全局管理所有实体的抗性配置，实现周期更新。
+### 4. SinFragmentManager — 玩家碎片系统
 
 ```java
-// src/main/java/org/attack_type/component/ResistanceManager.java
-public class ResistanceManager {
-    private static final Map<UUID, ResistanceProfile> PROFILES = new ConcurrentHashMap<>();
-    public static final long UPDATE_INTERVAL_TICKS = 24000L * 2; // 2天
-}
+// SinFragmentData
+int WRATH_fragments, LUST_fragments, ... ENVY_fragments;  // 七种
+SinType activeSinType;
+int activeSinLevel;           // 1/2/3
+long activeSinExpiryTicks;    // 激活持续时间（L1最长，L3最短）
 ```
 
-**关键逻辑：**
+阈值：
 
-- `getProfile(entity)` — 惰性初始化，玩家也会随机初始分配
-- `tickEntityResistance(entity, worldTime)` — 每2天触发随机重分配，每8天（4周期）总积减少0.01
-- 玩家不触发周期自动更新（由 GUI 手动控制）
+| 阈值 | 定义 | 行为 |
+|------|------|------|
+| 500 | OVERFLOW 溢出 | 下次对应罪孽攻击自动触发消耗（扣对应等级），HUD 显示"溢" |
+| 1000 | KILL 即死 | 直接 `player.kill()`，HUD 显示"死" |
+
+消耗公式：`cost(level, enchantLv) = ceil( baseCost(level) × (1 - 0.1×enchantLv) )`
 
 ### 5. MixinLivingEntity — 伤害计算注入
 
-通过 Mixin 修改 `LivingEntity.damage()`，实现自定义伤害公式。
+两个 ThreadLocal 贯穿整条 `damage()` 链：`PENDING_PHYS_MULT`（抗性×物理抗性附魔）、`PENDING_SIN_DAMAGE`（(lv×3+1)×罪孽抗性）。
 
-```java
-// src/main/java/org/attack_type/mixin/MixinLivingEntity.java
-@Mixin(LivingEntity.class)
-public abstract class MixinLivingEntity {
-    // 使用 ThreadLocal 在线程间传递计算结果
-    private static final ThreadLocal<Float> PENDING_PHYS_MULT = new ThreadLocal<>();
-    private static final ThreadLocal<Float> PENDING_SIN_DAMAGE = new ThreadLocal<>();
-}
-```
-
-**三个注入点：**
-
-| 注入 | 时机 | 作用 |
-|------|------|------|
-| `@Inject(method="damage", at=@At("HEAD"))` | 伤害计算前 | 计算物理抗性乘数、罪孽伤害 |
-| `@ModifyArg(applyArmorToDamage)` | 护甲减伤前 | 将物理抗性乘数应用于护甲减伤 |
-| `@ModifyArg(applyDamage)` | 最终扣血 | 叠加罪孽伤害（无视减伤） |
-
-**伤害计算流程：**
-
-```
-damage() 被调用
-  → HEAD: 计算 physMult(物理抗性×护甲附魔) 和 sinDamage(罪孽伤害)
-  → applyArmorToDamage: 护甲减伤 × physMult
-  → applyDamage: 最终伤害 + sinDamage
-```
+| 注入点 | 作用 |
+|------|------|
+| `damage HEAD` | 计算 pendingMult 和 pendingSinDamage，玩家 overflow 即死在此触发 |
+| `applyDamage ModifyArg` | `finalAmount = amount × mult + sinDamage`；最后清除 MOB_SIN_CACHE |
 
 ### 6. 附魔系统
 
-**SinEnchantment** — 罪孽附魔（7种），适用于所有物品，最高5级：
-
-```java
-// src/main/java/org/attack_type/enchantment/SinEnchantment.java
-public class SinEnchantment extends Enchantment {
-    public SinEnchantment(SinType sinType) {
-        super(Rarity.RARE, EnchantmentTarget.BREAKABLE, new EquipmentSlot[]{MAINHAND});
-    }
-    public int getMaxLevel() { return 5; }
-    public boolean isAcceptableItem(ItemStack stack) { return true; } // 所有物品
-}
-```
-
-**PhysicalResistanceEnchantment** — 物理抗性附魔（3种），仅防具，最高4级：
-
-```java
-// src/main/java/org/attack_type/enchantment/PhysicalResistanceEnchantment.java
-public class PhysicalResistanceEnchantment extends Enchantment {
-    public PhysicalResistanceEnchantment(AttackType attackType) {
-        super(Rarity.RARE, EnchantmentTarget.ARMOR,
-              new EquipmentSlot[]{HEAD, CHEST, LEGS, FEET});
-    }
-    public int getMaxLevel() { return 4; }
-    public float getResistanceMultiplier(int level) {
-        return 1.0f - level * 0.05f; // 每级减5%
-    }
-}
-```
-
-**ModEnchantments** — 附魔注册中心，使用 `Registries.ENCHANTMENT` 注册：
-
-```java
-// src/main/java/org/attack_type/enchantment/ModEnchantments.java
-public static final SinEnchantment WRATH = registerSin(SinType.WRATH);
-// ... 7种罪孽
-public static final PhysicalResistanceEnchantment SLASH_RESISTANCE = registerPhys(AttackType.SLASH);
-// ... 3种物理抗性
-```
+- **罪孽附魔 SinEnchantment × 7**：`Rarity.RARE`、`EnchantmentTarget.BREAKABLE`、`MAINHAND`，`isAcceptableItem(ItemStack)→true`（任意物品），max 5。
+- **物理抗性附魔 PhysicalResistanceEnchantment × 3**：`EnchantmentTarget.ARMOR`，四护甲槽，max 4，每级 `resist = 1 - 0.05×lv` 乘积叠加。
 
 ### 7. 网络通信
 
-**ModPackets** — 定义两个网络包标识符：
-
-```java
-// src/main/java/org/attack_type/network/ModPackets.java
-RESISTANCE_SYNC   // 服务端→客户端：同步抗性数据
-RESISTANCE_UPDATE // 客户端→服务端：玩家提交抗性变更
+```
+ModPackets (Identifiers):
+  RESISTANCE_SYNC   S→C   ResistanceProfile NBT（玩家登录 / 更改后广播）
+  RESISTANCE_UPDATE C→S   玩家 ResistanceScreen 提交 10×float + product
+  FRAGMENT_SYNC     S→C   7×int fragments + activeSin + level + expiry
+  FRAGMENT_TRIGGER  C→S   客户端按 \ 触发：激活罪孽 ordinal + 期望等级
 ```
 
-**NetworkHandler**（服务端）— 接收玩家抗性更新并广播：
+### 8. 抗性分配 GUI（ResistanceScreen）
 
-```java
-// src/main/java/org/attack_type/network/NetworkHandler.java
-ServerPlayNetworking.registerGlobalReceiver(RESISTANCE_UPDATE, (server, player, ...) -> {
-    // 读取玩家提交的10个抗性值 + totalProduct
-    // 调用 normalize() 确保总积一致
-    // 广播回客户端
-});
+单列布局（修复了旧版双列标签叠在左输入框上的 bug）：
+
+```
+[ 标签 64px ]  [ 输入框 72px ]  [ 状态 耐性/脆弱 ]  { >5? 红色 > 标记 }
 ```
 
-**NetworkHandlerClient**（客户端）— 接收服务端同步：
+- `TextFieldWidget.setDrawsBackground(false)`，自行 `drawFieldBorder()` 画 1px 灰边（overflow 变红色 0xFFFF5555）+ 深灰底，**去除默认橙色选中框阴影不跟随的缺陷**。
+- 实时乘算 `product = Π 10抗性`，底部显示 `Total Product: x.xxxx  ✓ OK / ✗ <1`（≥1 绿色，否则红色）。
 
-```java
-// src/client/java/org/attack_type/network/NetworkHandlerClient.java
-ClientPlayNetworking.registerGlobalReceiver(RESISTANCE_SYNC, (client, ...) -> {
-    // 反序列化并缓存到 ClientResistanceCache
-});
-```
+### 9. 客户端入口（Attack_typeClient）
 
-**ClientResistanceCache** — 客户端内存缓存，GUI 读取/写入：
+注册 4 个 KeyBinding（U / [ / ] / \），在 `END_CLIENT_TICK` 里处理：
 
-```java
-// src/client/java/org/attack_type/network/ClientResistanceCache.java
-public class ClientResistanceCache {
-    private static ResistanceProfile cachedProfile;
-}
-```
+- `U` → `setScreen(new ResistanceScreen())`
+- `[` / `]` → `cycleActiveSin(+1/-1)` → hotbar 区提示 `Active Sin: X`
+- `\` → `sendTriggerPacket(level)` 发包给服务端，由服务端确认消耗并应用
 
-### 8. ResistanceScreen — 抗性分配 GUI
+### 10. 国际化 (i18n)
 
-U 键打开，每个抗性提供 ±0.1 和 ±0.01 微调按钮，应用后通过 `RESISTANCE_UPDATE` 发包到服务端。
+`assets/attack_type/lang/{zh_cn,en_us}.json` 覆盖：
 
-```java
-// src/client/java/org/attack_type/gui/ResistanceScreen.java
-public class ResistanceScreen extends Screen {
-    // 3种物理抗性 + 7种罪孽抗性 = 10行 × 4个按钮
-    // 实时显示当前值、等级标签、总积
-}
-```
-
-### 9. Attack_typeClient — 客户端入口
-
-注册 U 键快捷键和网络包：
-
-```java
-// src/client/java/org/attack_type/client/Attack_typeClient.java
-KeyBinding resistanceKey = new KeyBinding("key.attack_type.resistance",
-    InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_U, "category.attack_type");
-// 按键处理：打开 ResistanceScreen
-ClientTickEvents.END_CLIENT_TICK.register(client -> {
-    while (resistanceKey.wasPressed()) {
-        MinecraftClient.getInstance().setScreen(new ResistanceScreen());
-    }
-});
-```
-
-### 10. Attack_type — 主入口
-
-```java
-// src/main/java/org/attack_type/Attack_type.java
-public class Attack_type implements ModInitializer {
-    public void onInitialize() {
-        ModEnchantments.initialize();       // 注册10种附魔
-        NetworkHandler.registerServer();    // 注册服务端网络包
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            NetworkHandler.sendResistanceSync(handler.player); // 玩家加入时同步
-        });
-    }
-}
-```
+- 键位分类 & 名称：`category.attack_type` / `key.attack_type.*`
+- 屏幕文本：`screen.attack_type.resistance/apply/physical/sin/total_product_*/ok/lt1/vulnerable/resist`
+- HUD：`hud.attack_type.active_sin / overflow_char / death_char`
+- 附魔：`enchantment.attack_type.<sin>` + `.desc`、物理抗性 `slash/pierce/blunt_resistance` + `.desc`
+- 罪孽名称：`sin.attack_type.<sin>`；物理类型 `attack_type.attack_type.<type>`
+- 指令：`cmd.attack_type.err_* / get_title / total_product / physical_title / sin_title / resistance_row / set_ok / reset_ok / tick_ok` 以及碎片 `frag_*` 系列
 
 ---
 
@@ -389,8 +309,13 @@ public class Attack_type implements ModInitializer {
 
 ---
 
-## 按键操作
+## 多语言
 
-| 按键 | 功能 |
+目前已内置：
+
+| 文件 | 语言 |
 |------|------|
-| U | 打开/关闭抗性分配 GUI |
+| `assets/attack_type/lang/zh_cn.json` | 简体中文（默认） |
+| `assets/attack_type/lang/en_us.json` | English |
+
+切换 Minecraft 语言设置后，GUI、HUD、指令反馈、附魔名称/描述会全部对应切换。
