@@ -2,64 +2,109 @@ package org.attack_type.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import org.attack_type.Attack_type;
 import org.attack_type.api.SinType;
 import org.attack_type.fragment.ClientFragmentCache;
 
 public class SinFragmentHUD {
 
+    public static final Identifier WRATH = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/wrath.png");
+    public static final Identifier LUST = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/lust.png");
+    public static final Identifier SLOTH = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/sloth.png");
+    public static final Identifier GLUTTONY = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/gluttony.png");
+    public static final Identifier GLOOM = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/gloom.png");
+    public static final Identifier PRIDE = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/pride.png");
+    public static final Identifier ENVY = new Identifier(Attack_type.MOD_ID, "textures/gui/sin_fragment/envy.png");
+
+    private static final Identifier[] TEXTURES = {WRATH, LUST, SLOTH, GLUTTONY, GLOOM, PRIDE, ENVY};
+
     private static final int[] COLORS = {
-            0xFF4444, // WRATH
-            0xFF88FF, // LUST
-            0x8888FF, // SLOTH
-            0xFFAA44, // GLUTTONY
-            0x6666AA, // GLOOM
-            0xFFDD44, // PRIDE
-            0x44DD44, // ENVY
+            0xFF4444, 0xFF88FF, 0x8888FF,
+            0xFFAA44, 0x6666AA, 0xFFDD44, 0x44DD44
     };
 
-    private static final String[] SHORT_NAMES = {
-            "WRA", "LUS", "SLO", "GLU", "GLO", "PRI", "ENV"
-    };
+    public static final int ICON_SIZE = 32;
+    private static final int PADDING = 2;
+    private static final int ROWS = 1;
 
     public static void render(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) return;
-        if (client.options.hudHidden) return;
+        if (client.player == null || client.options.hudHidden) return;
+
+        SinType[] types = SinType.values();
+        SinType selected = ClientFragmentCache.getActiveSinType();
+        int selectedLevel = ClientFragmentCache.getActiveSinLevel();
+
+        int cols = types.length;
+        int totalWidth = cols * ICON_SIZE + (cols + 1) * PADDING;
+        int totalHeight = ROWS * ICON_SIZE + (ROWS + 1) * PADDING + 14;
 
         int x = 4;
         int y = 4;
-        int barWidth = 60;
-        int barHeight = 10;
-        int spacing = 14;
 
-        SinType[] types = SinType.values();
         for (int i = 0; i < types.length; i++) {
             SinType type = types[i];
             int count = ClientFragmentCache.getFragments(type);
+            Identifier tex = TEXTURES[i];
             int color = COLORS[i];
-            int rowY = y + i * spacing;
+            boolean isSelected = selected == type;
 
-            context.drawTextWithShadow(client.textRenderer, SHORT_NAMES[i], x, rowY, color);
+            int cellX = x + PADDING + i * (ICON_SIZE + PADDING);
+            int cellY = y + PADDING;
 
-            int barX = x + 30;
-            context.fill(barX, rowY + 1, barX + barWidth, rowY + 1 + barHeight, 0x44000000);
-
-            int fillWidth = Math.min(barWidth, (int) ((count / 1000.0f) * barWidth));
-            if (fillWidth > 0) {
-                context.fill(barX, rowY + 1, barX + fillWidth, rowY + 1 + barHeight, color | 0xAA000000);
+            if (isSelected) {
+                context.fill(cellX - 1, cellY - 1, cellX + ICON_SIZE + 1, cellY + ICON_SIZE + 1, 0xFFFFAA00);
             }
+            if (count >= 1000) {
+                context.fill(cellX - 2, cellY - 2, cellX + ICON_SIZE + 2, cellY + ICON_SIZE + 2, 0xFFFF0000);
+            } else if (count >= 500) {
+                context.fill(cellX - 1, cellY - 1, cellX + ICON_SIZE + 1, cellY + ICON_SIZE + 1, 0x99FF5555);
+            }
+
+            drawIcon(context, tex, cellX, cellY, color, count);
 
             String countText = String.valueOf(count);
-            int textColor = count >= 500 ? 0xFF4444 : 0xFFFFFF;
-            context.drawTextWithShadow(client.textRenderer, countText, barX + barWidth + 4, rowY, textColor);
+            int tw = client.textRenderer.getWidth(countText);
+            int tx = cellX + (ICON_SIZE - tw) / 2;
+            int ty = cellY + ICON_SIZE - 11;
+            int textColor = count >= 1000 ? 0xFFFF0000 : count >= 500 ? 0xFFFF5555 : 0xFFFFFF;
+            context.fill(tx - 2, ty - 1, tx + tw + 2, ty + 10, 0x77000000);
+            context.drawTextWithShadow(client.textRenderer, countText, tx, ty, textColor);
 
-            boolean isActive = ClientFragmentCache.getActiveSinType() == type && ClientFragmentCache.getActiveSinLevel() > 0;
-            if (isActive) {
-                context.drawTextWithShadow(client.textRenderer,
-                        "L" + ClientFragmentCache.getActiveSinLevel(),
-                        barX + barWidth + 28, rowY, 0xFFFF55);
+            if (isSelected && selectedLevel > 0) {
+                String lv = "L" + selectedLevel;
+                int tw2 = client.textRenderer.getWidth(lv);
+                int tx2 = cellX + ICON_SIZE - tw2 - 2;
+                int ty2 = cellY + 2;
+                context.fill(tx2 - 2, ty2 - 1, tx2 + tw2 + 2, ty2 + 10, 0xBB000000);
+                context.drawTextWithShadow(client.textRenderer, lv, tx2, ty2, 0xFFFFEE55);
+            }
+
+            if (count >= 1000) {
+                String kc = "DEATH";
+                int tw3 = client.textRenderer.getWidth(kc);
+                int tx3 = cellX + (ICON_SIZE - tw3) / 2;
+                int ty3 = cellY + (ICON_SIZE / 2) - 5;
+                context.fill(tx3 - 2, ty3 - 1, tx3 + tw3 + 2, ty3 + 10, 0xAAFF0000);
+                context.drawTextWithShadow(client.textRenderer, kc, tx3, ty3, 0xFFFFFFFF);
+            } else if (count >= 500) {
+                String of = "OVER";
+                int tw3 = client.textRenderer.getWidth(of);
+                int tx3 = cellX + (ICON_SIZE - tw3) / 2;
+                int ty3 = cellY + (ICON_SIZE / 2) - 5;
+                context.fill(tx3 - 2, ty3 - 1, tx3 + tw3 + 2, ty3 + 10, 0x99FF4444);
+                context.drawTextWithShadow(client.textRenderer, of, tx3, ty3, 0xFFFFFFFF);
             }
         }
+    }
+
+    private static void drawIcon(DrawContext context, Identifier tex, int x, int y, int color, int count) {
+        float alpha = 0.4f + Math.min(0.6f, count / 500.0f);
+        int a = (int) (alpha * 255);
+        int rgba = (a << 24) | (color & 0x00FFFFFF);
+        context.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
+        context.drawTexture(tex, x, y, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
+        context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
