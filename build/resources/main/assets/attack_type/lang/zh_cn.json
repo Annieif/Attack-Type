@@ -1,0 +1,45 @@
+{
+  "category.attack_type": "攻击类型",
+  "key.attack_type.resistance": "打开抗性分配",
+  "screen.attack_type.resistance": "抗性分配",
+  "screen.attack_type.apply": "应用",
+  "screen.attack_type.physical": "物理抗性",
+  "screen.attack_type.sin": "罪孽抗性",
+  "screen.attack_type.total_product": "总积: %s",
+
+  "attack_type.attack_type.slash": "斩击",
+  "attack_type.attack_type.pierce": "突刺",
+  "attack_type.attack_type.blunt": "打击",
+
+  "sin.attack_type.wrath": "暴怒",
+  "sin.attack_type.lust": "色欲",
+  "sin.attack_type.sloth": "怠惰",
+  "sin.attack_type.gluttony": "暴食",
+  "sin.attack_type.gloom": "忧郁",
+  "sin.attack_type.pride": "傲慢",
+  "sin.attack_type.envy": "嫉妒",
+
+  "enchantment.attack_type.wrath": "暴怒",
+  "enchantment.attack_type.lust": "色欲",
+  "enchantment.attack_type.sloth": "怠惰",
+  "enchantment.attack_type.gluttony": "暴食",
+  "enchantment.attack_type.gloom": "忧郁",
+  "enchantment.attack_type.pride": "傲慢",
+  "enchantment.attack_type.envy": "嫉妒",
+
+  "enchantment.attack_type.slash_resistance": "斩击抗性",
+  "enchantment.attack_type.pierce_resistance": "突刺抗性",
+  "enchantment.attack_type.blunt_resistance": "打击抗性",
+
+  "enchantment.attack_type.wrath.desc": "攻击附带暴怒罪孽伤害",
+  "enchantment.attack_type.lust.desc": "攻击附带色欲罪孽伤害",
+  "enchantment.attack_type.sloth.desc": "攻击附带怠惰罪孽伤害",
+  "enchantment.attack_type.gluttony.desc": "攻击附带暴食罪孽伤害",
+  "enchantment.attack_type.gloom.desc": "攻击附带忧郁罪孽伤害",
+  "enchantment.attack_type.pride.desc": "攻击附带傲慢罪孽伤害",
+  "enchantment.attack_type.envy.desc": "攻击附带嫉妒罪孽伤害",
+
+  "enchantment.attack_type.slash_resistance.desc": "减少受到的斩击伤害",
+  "enchantment.attack_type.pierce_resistance.desc": "减少受到的突刺伤害",
+  "enchantment.attack_type.blunt_resistance.desc": "减少受到的打击伤害"
+}

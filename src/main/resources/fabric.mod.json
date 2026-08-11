@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "attack_type",
+  "version": "${version}",
+  "name": "Attack Type",
+  "description": "Adds Attack Type and Sin Attribute damage system to Minecraft. All attacks have physical types (Slash/Pierce/Blunt) and sin attributes (7 Deadly Sins).",
+  "authors": ["yyk"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/attack_type/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "org.attack_type.client.Attack_typeDataGenerator"
+    ],
+    "client": [
+      "org.attack_type.client.Attack_typeClient"
+    ],
+    "main": [
+      "org.attack_type.Attack_type"
+    ]
+  },
+  "mixins": [
+    "attack_type.mixins.json",
+    {
+      "config": "attack_type.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

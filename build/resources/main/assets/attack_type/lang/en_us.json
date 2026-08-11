@@ -1,0 +1,45 @@
+{
+  "category.attack_type": "Attack Type",
+  "key.attack_type.resistance": "Open Resistance GUI",
+  "screen.attack_type.resistance": "Resistance Allocation",
+  "screen.attack_type.apply": "Apply",
+  "screen.attack_type.physical": "Physical Resistance",
+  "screen.attack_type.sin": "Sin Resistance",
+  "screen.attack_type.total_product": "Total Product: %s",
+
+  "attack_type.attack_type.slash": "Slash",
+  "attack_type.attack_type.pierce": "Pierce",
+  "attack_type.attack_type.blunt": "Blunt",
+
+  "sin.attack_type.wrath": "Wrath",
+  "sin.attack_type.lust": "Lust",
+  "sin.attack_type.sloth": "Sloth",
+  "sin.attack_type.gluttony": "Gluttony",
+  "sin.attack_type.gloom": "Gloom",
+  "sin.attack_type.pride": "Pride",
+  "sin.attack_type.envy": "Envy",
+
+  "enchantment.attack_type.wrath": "Wrath",
+  "enchantment.attack_type.lust": "Lust",
+  "enchantment.attack_type.sloth": "Sloth",
+  "enchantment.attack_type.gluttony": "Gluttony",
+  "enchantment.attack_type.gloom": "Gloom",
+  "enchantment.attack_type.pride": "Pride",
+  "enchantment.attack_type.envy": "Envy",
+
+  "enchantment.attack_type.slash_resistance": "Slash Resistance",
+  "enchantment.attack_type.pierce_resistance": "Pierce Resistance",
+  "enchantment.attack_type.blunt_resistance": "Blunt Resistance",
+
+  "enchantment.attack_type.wrath.desc": "Adds Wrath sin damage to attacks",
+  "enchantment.attack_type.lust.desc": "Adds Lust sin damage to attacks",
+  "enchantment.attack_type.sloth.desc": "Adds Sloth sin damage to attacks",
+  "enchantment.attack_type.gluttony.desc": "Adds Gluttony sin damage to attacks",
+  "enchantment.attack_type.gloom.desc": "Adds Gloom sin damage to attacks",
+  "enchantment.attack_type.pride.desc": "Adds Pride sin damage to attacks",
+  "enchantment.attack_type.envy.desc": "Adds Envy sin damage to attacks",
+
+  "enchantment.attack_type.slash_resistance.desc": "Reduces Slash damage taken",
+  "enchantment.attack_type.pierce_resistance.desc": "Reduces Pierce damage taken",
+  "enchantment.attack_type.blunt_resistance.desc": "Reduces Blunt damage taken"
+}

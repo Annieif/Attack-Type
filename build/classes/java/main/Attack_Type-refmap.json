@@ -1,0 +1,26 @@
+{
+  "mappings": {
+    "org/attack_type/mixin/MixinLivingEntity": {
+      "Lnet/minecraft/entity/LivingEntity;applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F": "Lnet/minecraft/class_1309;method_6132(Lnet/minecraft/class_1282;F)F",
+      "Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V": "Lnet/minecraft/class_1309;method_6074(Lnet/minecraft/class_1282;F)V",
+      "damage": "Lnet/minecraft/class_1309;method_5643(Lnet/minecraft/class_1282;F)Z",
+      "onDeath": "Lnet/minecraft/class_1309;method_6078(Lnet/minecraft/class_1282;)V",
+      "readCustomDataFromNbt": "Lnet/minecraft/class_1309;method_5749(Lnet/minecraft/class_2487;)V",
+      "tick": "Lnet/minecraft/class_1309;method_5773()V",
+      "writeCustomDataToNbt": "Lnet/minecraft/class_1309;method_5652(Lnet/minecraft/class_2487;)V"
+    }
+  },
+  "data": {
+    "named:intermediary": {
+      "org/attack_type/mixin/MixinLivingEntity": {
+        "Lnet/minecraft/entity/LivingEntity;applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F": "Lnet/minecraft/class_1309;method_6132(Lnet/minecraft/class_1282;F)F",
+        "Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V": "Lnet/minecraft/class_1309;method_6074(Lnet/minecraft/class_1282;F)V",
+        "damage": "Lnet/minecraft/class_1309;method_5643(Lnet/minecraft/class_1282;F)Z",
+        "onDeath": "Lnet/minecraft/class_1309;method_6078(Lnet/minecraft/class_1282;)V",
+        "readCustomDataFromNbt": "Lnet/minecraft/class_1309;method_5749(Lnet/minecraft/class_2487;)V",
+        "tick": "Lnet/minecraft/class_1309;method_5773()V",
+        "writeCustomDataToNbt": "Lnet/minecraft/class_1309;method_5652(Lnet/minecraft/class_2487;)V"
+      }
+    }
+  }
+}
