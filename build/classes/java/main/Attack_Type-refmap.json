@@ -1,25 +1,67 @@
 {
   "mappings": {
+    "org/attack_type/mixin/MixinAnimalEntity": {
+      "breed": "Lnet/minecraft/class_1429;method_24650(Lnet/minecraft/class_3218;Lnet/minecraft/class_1429;)V"
+    },
+    "org/attack_type/mixin/MixinLightningStrike": {
+      "onStruckByLightning": "Lnet/minecraft/class_1297;method_5800(Lnet/minecraft/class_3218;Lnet/minecraft/class_1538;)V"
+    },
     "org/attack_type/mixin/MixinLivingEntity": {
-      "Lnet/minecraft/entity/LivingEntity;applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F": "Lnet/minecraft/class_1309;method_6132(Lnet/minecraft/class_1282;F)F",
       "Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V": "Lnet/minecraft/class_1309;method_6074(Lnet/minecraft/class_1282;F)V",
       "damage": "Lnet/minecraft/class_1309;method_5643(Lnet/minecraft/class_1282;F)Z",
       "onDeath": "Lnet/minecraft/class_1309;method_6078(Lnet/minecraft/class_1282;)V",
       "readCustomDataFromNbt": "Lnet/minecraft/class_1309;method_5749(Lnet/minecraft/class_2487;)V",
       "tick": "Lnet/minecraft/class_1309;method_5773()V",
       "writeCustomDataToNbt": "Lnet/minecraft/class_1309;method_5652(Lnet/minecraft/class_2487;)V"
+    },
+    "org/attack_type/mixin/MixinPlayerAdvancementTracker": {
+      "grantCriterion": "Lnet/minecraft/class_2985;method_12878(Lnet/minecraft/class_161;Ljava/lang/String;)Z"
+    },
+    "org/attack_type/mixin/MixinPlayerEntity": {
+      "canConsume": "Lnet/minecraft/class_1657;method_7332(Z)Z"
+    },
+    "org/attack_type/mixin/MixinServerPlayerEntity": {
+      "trySleep": "Lnet/minecraft/class_3222;method_7269(Lnet/minecraft/class_2338;)Lcom/mojang/datafixers/util/Either;",
+      "wakeUp": "Lnet/minecraft/class_3222;method_7358(ZZ)V"
+    },
+    "org/attack_type/mixin/MixinZombieEntity": {
+      "convertTo": "Lnet/minecraft/class_1642;method_7200(Lnet/minecraft/class_1299;)V"
+    },
+    "org/attack_type/mixin/MixinZombieVillagerEntity": {
+      "finishConversion": "Lnet/minecraft/class_1641;method_7197(Lnet/minecraft/class_3218;)V"
     }
   },
   "data": {
     "named:intermediary": {
+      "org/attack_type/mixin/MixinAnimalEntity": {
+        "breed": "Lnet/minecraft/class_1429;method_24650(Lnet/minecraft/class_3218;Lnet/minecraft/class_1429;)V"
+      },
+      "org/attack_type/mixin/MixinLightningStrike": {
+        "onStruckByLightning": "Lnet/minecraft/class_1297;method_5800(Lnet/minecraft/class_3218;Lnet/minecraft/class_1538;)V"
+      },
       "org/attack_type/mixin/MixinLivingEntity": {
-        "Lnet/minecraft/entity/LivingEntity;applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F": "Lnet/minecraft/class_1309;method_6132(Lnet/minecraft/class_1282;F)F",
         "Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V": "Lnet/minecraft/class_1309;method_6074(Lnet/minecraft/class_1282;F)V",
         "damage": "Lnet/minecraft/class_1309;method_5643(Lnet/minecraft/class_1282;F)Z",
         "onDeath": "Lnet/minecraft/class_1309;method_6078(Lnet/minecraft/class_1282;)V",
         "readCustomDataFromNbt": "Lnet/minecraft/class_1309;method_5749(Lnet/minecraft/class_2487;)V",
         "tick": "Lnet/minecraft/class_1309;method_5773()V",
         "writeCustomDataToNbt": "Lnet/minecraft/class_1309;method_5652(Lnet/minecraft/class_2487;)V"
+      },
+      "org/attack_type/mixin/MixinPlayerAdvancementTracker": {
+        "grantCriterion": "Lnet/minecraft/class_2985;method_12878(Lnet/minecraft/class_161;Ljava/lang/String;)Z"
+      },
+      "org/attack_type/mixin/MixinPlayerEntity": {
+        "canConsume": "Lnet/minecraft/class_1657;method_7332(Z)Z"
+      },
+      "org/attack_type/mixin/MixinServerPlayerEntity": {
+        "trySleep": "Lnet/minecraft/class_3222;method_7269(Lnet/minecraft/class_2338;)Lcom/mojang/datafixers/util/Either;",
+        "wakeUp": "Lnet/minecraft/class_3222;method_7358(ZZ)V"
+      },
+      "org/attack_type/mixin/MixinZombieEntity": {
+        "convertTo": "Lnet/minecraft/class_1642;method_7200(Lnet/minecraft/class_1299;)V"
+      },
+      "org/attack_type/mixin/MixinZombieVillagerEntity": {
+        "finishConversion": "Lnet/minecraft/class_1641;method_7197(Lnet/minecraft/class_3218;)V"
       }
     }
   }

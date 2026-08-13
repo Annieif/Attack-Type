@@ -4,7 +4,14 @@
   "package": "org.attack_type.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinLivingEntity"
+    "MixinLivingEntity",
+    "MixinPlayerEntity",
+    "MixinServerPlayerEntity",
+    "MixinLightningStrike",
+    "MixinPlayerAdvancementTracker",
+    "MixinAnimalEntity",
+    "MixinZombieVillagerEntity",
+    "MixinZombieEntity"
   ],
   "injectors": {
     "defaultRequire": 1
