@@ -21,6 +21,7 @@ import org.attack_type.api.AttackType;
 import org.attack_type.api.ResistanceProfile;
 import org.attack_type.api.SinType;
 import org.attack_type.component.ResistanceManager;
+import org.attack_type.config.ModConfig;
 import org.attack_type.fragment.SinFragmentData;
 import org.attack_type.fragment.SinFragmentManager;
 import org.attack_type.network.NetworkHandler;
@@ -86,6 +87,9 @@ public class ResistanceCommand {
                 )
                 .then(CommandManager.literal("test")
                         .executes(ResistanceCommand::spawnTestDogs)
+                )
+                .then(CommandManager.literal("reload")
+                        .executes(ResistanceCommand::reloadConfig)
                 )
         );
     }
@@ -463,6 +467,16 @@ SinFragmentManager.getData(target).setFragments(sinType, amount);
                 }
                 break;
         }
+    }
+
+    /**
+     * 热重载配置。从外部 config/attack_type.json 或 jar 内 config.json 重新加载。
+     */
+    private static int reloadConfig(CommandContext<ServerCommandSource> ctx) {
+        ModConfig.load();
+        ctx.getSource().sendFeedback(
+                () -> Text.literal("[AttackType] Configuration reloaded."), true);
+        return 1;
     }
 
     /**
