@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.LivingEntity;
 import org.attack_type.command.ResistanceCommand;
 import org.attack_type.component.ResistanceManager;
+import org.attack_type.config.ModConfig;
 import org.attack_type.enchantment.ModEnchantments;
 import org.attack_type.fragment.SinFragmentAcquisition;
 import org.attack_type.fragment.SinFragmentManager;
@@ -37,6 +38,7 @@ public class Attack_type implements ModInitializer {
     public void onInitialize() {
         ModEnchantments.initialize();
         NetworkHandler.registerServer();
+        ModConfig.load();
         SinFragmentAcquisition.register();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

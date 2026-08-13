@@ -2,6 +2,7 @@ package org.attack_type.fragment;
 
 import net.minecraft.nbt.NbtCompound;
 import org.attack_type.api.SinType;
+import org.attack_type.config.ModConfig;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -13,18 +14,8 @@ import java.util.Set;
  * <p>
  * 存储 7 种罪孽碎片计数、激活罪孽状态和触发消耗常量。
  *
- * <h3>关键常量</h3>
- * <table>
- *   <tr><th>常量</th><th>值</th><th>说明</th></tr>
- *   <tr><td>{@link #COST_LEVEL_1}</td><td>40</td><td>L1 触发消耗碎片</td></tr>
- *   <tr><td>{@link #COST_LEVEL_2}</td><td>70</td><td>L2 触发消耗碎片</td></tr>
- *   <tr><td>{@link #COST_LEVEL_3}</td><td>100</td><td>L3 触发消耗碎片</td></tr>
- *   <tr><td>{@link #OVERFLOW_THRESHOLD}</td><td>500</td><td>溢出阈值（自动触发）</td></tr>
- *   <tr><td>{@link #KILL_THRESHOLD}</td><td>1000</td><td>即死阈值</td></tr>
- *   <tr><td>{@link #DURATION_L1_TICKS}</td><td>80</td><td>L1 激活持续（4 秒）</td></tr>
- *   <tr><td>{@link #DURATION_L2_TICKS}</td><td>140</td><td>L2 激活持续（7 秒）</td></tr>
- *   <tr><td>{@link #DURATION_L3_TICKS}</td><td>200</td><td>L3 激活持续（10 秒）</td></tr>
- * </table>
+ * <h3>配置常量</h3>
+ * <p>所有可调参数通过 {@link ModConfig} 从 config.json 加载。</p>
  *
  * <h3>附魔减耗</h3>
  * 实际消耗 = max(1, baseCost - 2 × enchantLevel)，见 {@link #getCostWithEnchantment(int, int)}。
@@ -35,16 +26,6 @@ public class SinFragmentData {
     private SinType activeSinType = SinType.WRATH;
     private int activeSinLevel = 0;
     private long activeSinExpiry = 0;
-
-    public static final int COST_LEVEL_1 = 40;
-    public static final int COST_LEVEL_2 = 70;
-    public static final int COST_LEVEL_3 = 100;
-    public static final int OVERFLOW_THRESHOLD = 500;
-    public static final int KILL_THRESHOLD = 1000;
-
-    public static final int DURATION_L1_TICKS = 80;
-    public static final int DURATION_L2_TICKS = 140;
-    public static final int DURATION_L3_TICKS = 200;
 
     /**
      * 创建碎片数据，所有碎片初始化为 0。
@@ -136,17 +117,17 @@ public class SinFragmentData {
     }
 
     /**
-     * 检查碎片是否达到溢出阈值（≥500）。
+     * 检查碎片是否达到溢出阈值。
      */
     public boolean isOverflowing(SinType type) {
-        return getFragments(type) >= OVERFLOW_THRESHOLD;
+        return getFragments(type) >= ModConfig.OVERFLOW_THRESHOLD;
     }
 
     /**
-     * 检查碎片是否达到即死阈值（≥1000）。
+     * 检查碎片是否达到即死阈值。
      */
     public boolean shouldKill(SinType type) {
-        return getFragments(type) >= KILL_THRESHOLD;
+        return getFragments(type) >= ModConfig.KILL_THRESHOLD;
     }
 
     /**

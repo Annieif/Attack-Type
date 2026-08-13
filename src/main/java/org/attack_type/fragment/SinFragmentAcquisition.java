@@ -16,6 +16,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.attack_type.api.SinType;
+import org.attack_type.config.ModConfig;
 import org.attack_type.network.NetworkHandler;
 
 import java.util.*;
@@ -49,11 +50,6 @@ public class SinFragmentAcquisition {
     /** 鸡蛋上次使用时间（LUST 冷却） */
     private static final Map<UUID, Long> LAST_EGG_TIME = new HashMap<>();
 
-    private static final int PRIDE_CRAFT_THRESHOLD = 9 * 64; // 9组 = 576
-    private static final int AFK_INTERVAL_TICKS = 20 * 60; // 1分钟 = 1200 ticks
-    private static final int ENVY_INTERVAL_TICKS = 20 * 60; // 1分钟
-    private static final int EGG_COOLDOWN_TICKS = 20 * 5; // 5秒冷却
-
     /**
      * 注册所有碎片获取事件监听器。在模组初始化时调用。
      */
@@ -77,12 +73,14 @@ public class SinFragmentAcquisition {
                 Long last = LAST_KILL_TIME.get(player.getUuid());
                 if (last != null) {
                     long diff = now - last;
-                    int bonus;
-                    if (diff <= 20) bonus = 7;       // 1秒
-                    else if (diff <= 40) bonus = 5;   // 2秒
-                    else if (diff <= 100) bonus = 3;  // 5秒
-                    else if (diff <= 200) bonus = 1;  // 10秒
-                    else bonus = 0;
+                    int bonus = 0;
+                    int[] intervals = ModConfig.WRATH_KILL_CHAIN_INTERVALS;
+                    int[] bonuses = ModConfig.WRATH_KILL_CHAIN_BONUSES;
+                    for (int i = 0; i < intervals.length; i++) {
+                        if (diff <= intervals[i] && bonus == 0) {
+                            bonus = bonuses[i];
+                        }
+                    }
                     if (bonus > 0) {
                         SinFragmentManager.addFragments(player, SinType.WRATH, bonus);
                         NetworkHandler.sendFragmentSync(player);
@@ -108,9 +106,9 @@ public class SinFragmentAcquisition {
             if (stack.getItem() == Items.EGG) {
                 long now = world.getTime();
                 Long last = LAST_EGG_TIME.get(player.getUuid());
-                if (last == null || now - last >= EGG_COOLDOWN_TICKS) {
+                if (last == null || now - last >= ModConfig.LUST_EGG_COOLDOWN_TICKS) {
                     LAST_EGG_TIME.put(player.getUuid(), now);
-                    SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.LUST, 1);
+                    SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.LUST, ModConfig.LUST_EGG_AMOUNT);
                     NetworkHandler.sendFragmentSync((ServerPlayerEntity) player);
                 }
             }
@@ -148,8 +146,8 @@ public class SinFragmentAcquisition {
                 int ticks = AFK_TICKS.getOrDefault(uuid, 0);
                 if (!moved && !player.isSprinting() && player.isOnGround()) {
                     ticks++;
-                    if (ticks >= AFK_INTERVAL_TICKS) {
-                        SinFragmentManager.addFragments(player, SinType.SLOTH, 3);
+                    if (ticks >= ModConfig.SLOTH_AFK_INTERVAL_TICKS) {
+                        SinFragmentManager.addFragments(player, SinType.SLOTH, ModConfig.SLOTH_AFK_AMOUNT);
                         NetworkHandler.sendFragmentSync(player);
                         AFK_TICKS.put(uuid, 0);
                     } else {
@@ -171,7 +169,7 @@ public class SinFragmentAcquisition {
             if (world.isClient) return TypedActionResult.pass(player.getStackInHand(hand));
             ItemStack stack = player.getStackInHand(hand);
             if (stack.isFood()) {
-                SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.GLUTTONY, 1);
+                SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.GLUTTONY, ModConfig.GLUTTONY_PER_FOOD);
                 NetworkHandler.sendFragmentSync((ServerPlayerEntity) player);
             }
             return TypedActionResult.pass(stack);
@@ -181,12 +179,12 @@ public class SinFragmentAcquisition {
     // ==================== GLOOM 忧郁 — 受伤与目击 ====================
 
     private static void registerGloom() {
-        // 玩家受到伤害时（每10点伤害 +1 忧郁碎片）
+        // 玩家受到伤害时
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (entity instanceof ServerPlayerEntity player) {
-                int gloomFrag = (int) Math.ceil(amount / 10.0);
+                int gloomFrag = (int) Math.ceil(amount / (double) ModConfig.GLOOM_DAMAGE_PER_FRAGMENT);
                 if (gloomFrag > 0) {
-                    SinFragmentManager.addFragments(player, SinType.GLOOM, gloomFrag);
+                    SinFragmentManager.addFragments(player, SinType.GLOOM, gloomFrag * ModConfig.GLOOM_SELF_AMOUNT);
                     NetworkHandler.sendFragmentSync(player);
                 }
             }
@@ -199,13 +197,13 @@ public class SinFragmentAcquisition {
             if (entity instanceof PlayerEntity) return true;
             if (source.getAttacker() instanceof PlayerEntity) return true;
 
-            int gloomFrag = (int) Math.ceil(amount / 10.0);
+            int gloomFrag = (int) Math.ceil(amount / (double) ModConfig.GLOOM_DAMAGE_PER_FRAGMENT);
             if (gloomFrag <= 0) return true;
 
             Box box = entity.getBoundingBox().expand(32);
             for (PlayerEntity player : entity.getWorld().getPlayers()) {
                 if (player.getPos().distanceTo(entity.getPos()) <= 32) {
-                    SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.GLOOM, gloomFrag);
+                    SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.GLOOM, gloomFrag * ModConfig.GLOOM_WITNESS_AMOUNT);
                     NetworkHandler.sendFragmentSync((ServerPlayerEntity) player);
                 }
             }
@@ -224,11 +222,11 @@ public class SinFragmentAcquisition {
                     sum += player.getStatHandler().getStat(Stats.CRAFTED.getOrCreateStat(item));
                 }
                 int prev = CRAFTED_COUNT.getOrDefault(player.getUuid(), 0);
-                if (sum - prev >= PRIDE_CRAFT_THRESHOLD) {
-                    int multiples = (sum - prev) / PRIDE_CRAFT_THRESHOLD;
+                if (sum - prev >= ModConfig.PRIDE_CRAFT_THRESHOLD) {
+                    int multiples = (sum - prev) / ModConfig.PRIDE_CRAFT_THRESHOLD;
                     SinFragmentManager.addFragments(player, SinType.PRIDE, multiples);
                     NetworkHandler.sendFragmentSync(player);
-                    CRAFTED_COUNT.put(player.getUuid(), prev + multiples * PRIDE_CRAFT_THRESHOLD);
+                    CRAFTED_COUNT.put(player.getUuid(), prev + multiples * ModConfig.PRIDE_CRAFT_THRESHOLD);
                 } else if (prev == 0 && sum > 0) {
                     CRAFTED_COUNT.put(player.getUuid(), sum);
                 }
@@ -311,7 +309,7 @@ public class SinFragmentAcquisition {
                 UUID uuid = player.getUuid();
                 int timer = ENVY_TIMER.getOrDefault(uuid, 0);
                 timer++;
-                if (timer >= ENVY_INTERVAL_TICKS) {
+                if (timer >= ModConfig.ENVY_INTERVAL_TICKS) {
                     ENVY_TIMER.put(uuid, 0);
                     int myTier = getPlayerBestTier(player);
                     Box box = player.getBoundingBox().expand(16);
@@ -319,7 +317,7 @@ public class SinFragmentAcquisition {
                         if (entity instanceof PlayerEntity otherPlayer) {
                             int otherTier = getPlayerBestTier(otherPlayer);
                             if (otherTier > myTier) {
-                                SinFragmentManager.addFragments(player, SinType.ENVY, 3);
+                                SinFragmentManager.addFragments(player, SinType.ENVY, ModConfig.ENVY_COMPARE_AMOUNT);
                                 NetworkHandler.sendFragmentSync(player);
                                 break;
                             }
@@ -344,7 +342,7 @@ public class SinFragmentAcquisition {
         Box box = new Box(pos.x - 16, pos.y - 16, pos.z - 16, pos.x + 16, pos.y + 16, pos.z + 16);
         for (PlayerEntity player : world.getPlayers()) {
             if (player.getPos().distanceTo(pos) <= 16) {
-                SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.ENVY, 1);
+                SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.ENVY, ModConfig.ENVY_WITNESS_AMOUNT);
                 NetworkHandler.sendFragmentSync((ServerPlayerEntity) player);
             }
         }
@@ -364,7 +362,7 @@ public class SinFragmentAcquisition {
                 || victim instanceof MooshroomEntity
                 || victim instanceof VillagerEntity;
         if (isTransformable) {
-            findNearbyPlayerAndAddLustFragment(world, victim.getPos(), 10);
+            findNearbyPlayerAndAddLustFragment(world, victim.getPos(), ModConfig.LUST_LIGHTNING_AMOUNT);
         }
     }
 
@@ -373,7 +371,7 @@ public class SinFragmentAcquisition {
      */
     public static void onZombieVillagerCured(World world, Vec3d pos) {
         if (world.isClient) return;
-        findNearbyPlayerAndAddLustFragment(world, pos, 10);
+        findNearbyPlayerAndAddLustFragment(world, pos, ModConfig.LUST_CURE_AMOUNT);
     }
 
     /**
@@ -381,7 +379,7 @@ public class SinFragmentAcquisition {
      */
     public static void onZombieConvertToDrowned(World world, Vec3d pos) {
         if (world.isClient) return;
-        findNearbyPlayerAndAddLustFragment(world, pos, 5);
+        findNearbyPlayerAndAddLustFragment(world, pos, ModConfig.LUST_DROWN_AMOUNT);
     }
 
     /**
@@ -389,14 +387,14 @@ public class SinFragmentAcquisition {
      */
     public static void onAnimalBreed(World world, Vec3d pos) {
         if (world.isClient) return;
-        findNearbyPlayerAndAddLustFragment(world, pos, 1);
+        findNearbyPlayerAndAddLustFragment(world, pos, ModConfig.LUST_BREED_AMOUNT);
     }
 
     /**
      * 处理成就/进度达成（PRIDE +10）。
      */
     public static void onAdvancement(ServerPlayerEntity player) {
-        SinFragmentManager.addFragments(player, SinType.PRIDE, 10);
+        SinFragmentManager.addFragments(player, SinType.PRIDE, ModConfig.PRIDE_ACHIEVEMENT_AMOUNT);
         NetworkHandler.sendFragmentSync(player);
     }
 
@@ -404,7 +402,7 @@ public class SinFragmentAcquisition {
      * 处理烧炼/酿造/附魔（PRIDE +2）。
      */
     public static void onProduction(ServerPlayerEntity player) {
-        SinFragmentManager.addFragments(player, SinType.PRIDE, 2);
+        SinFragmentManager.addFragments(player, SinType.PRIDE, ModConfig.PRIDE_PRODUCTION_AMOUNT);
         NetworkHandler.sendFragmentSync(player);
     }
 
@@ -413,7 +411,7 @@ public class SinFragmentAcquisition {
      * 由 MixinServerPlayerEntity.wakeUp() 注入调用。
      */
     public static void onPlayerWakeUp(ServerPlayerEntity player) {
-        SinFragmentManager.addFragments(player, SinType.SLOTH, 5);
+        SinFragmentManager.addFragments(player, SinType.SLOTH, ModConfig.SLOTH_SLEEP_AMOUNT);
         NetworkHandler.sendFragmentSync(player);
     }
 }

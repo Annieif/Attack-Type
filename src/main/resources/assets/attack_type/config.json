@@ -1,0 +1,65 @@
+{
+  "_comment": "Attack Type Mod — 统一配置文件",
+  "_description": "所有可调参数。修改后重启游戏生效。",
+
+  "fragmentCosts": {
+    "level1": 40,
+    "level2": 70,
+    "level3": 100
+  },
+
+  "fragmentThresholds": {
+    "overflow": 500,
+    "kill": 1000
+  },
+
+  "fragmentDurations": {
+    "level1Ticks": 80,
+    "level2Ticks": 140,
+    "level3Ticks": 200
+  },
+
+  "fragmentAcquisition": {
+    "wrath": {
+      "killChainBonuses": [7, 5, 3, 1],
+      "killChainIntervals": [20, 40, 100, 200]
+    },
+    "lust": {
+      "eggCooldownTicks": 100,
+      "eggAmount": 1,
+      "breedAmount": 1,
+      "cureAmount": 10,
+      "convertAmount": 5,
+      "drownAmount": 5,
+      "lightningAmount": 5
+    },
+    "sloth": {
+      "afkIntervalTicks": 1200,
+      "afkAmount": 3,
+      "sleepAmount": 5
+    },
+    "gluttony": {
+      "perFood": 1
+    },
+    "gloom": {
+      "damagePerFragment": 10,
+      "selfAmount": 1,
+      "witnessAmount": 1
+    },
+    "pride": {
+      "craftThreshold": 576,
+      "achievementAmount": 10,
+      "productionAmount": 2
+    },
+    "envy": {
+      "intervalTicks": 1200,
+      "compareAmount": 3,
+      "witnessAmount": 1
+    }
+  },
+
+  "totalProduct": {
+    "decayRate": 0.1,
+    "minProduct": 0.1
+  }
+}

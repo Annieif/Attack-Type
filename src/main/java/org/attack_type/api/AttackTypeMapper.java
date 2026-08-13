@@ -9,8 +9,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import org.attack_type.config.ModConfig;
 import org.attack_type.enchantment.ModEnchantments;
-import org.attack_type.fragment.SinFragmentData;
 import org.attack_type.fragment.SinFragmentManager;
 
 import java.util.Random;
@@ -91,15 +91,15 @@ public class AttackTypeMapper {
 
             for (SinType sinType : SinType.values()) {
                 int frags = SinFragmentManager.getData(player).getFragments(sinType);
-                if (frags >= 100) {
-                    int cost = SinFragmentData.COST_LEVEL_3;
+                if (frags >= ModConfig.COST_LEVEL_3) {
+                    int cost = ModConfig.COST_LEVEL_3;
                     Enchantment enchant = ModEnchantments.getSinEnchantment(sinType);
                     int enchantLevel = enchant != null ? EnchantmentHelper.getLevel(enchant, player.getMainHandStack()) : 0;
                     cost = SinFragmentManager.getData(player).getCostWithEnchantment(cost, enchantLevel);
                     if (SinFragmentManager.getData(player).consumeFragments(sinType, cost)) {
                         SinFragmentManager.getData(player).setActiveSinType(sinType);
                         SinFragmentManager.getData(player).setActiveSinLevel(3);
-                        SinFragmentManager.getData(player).setActiveSinExpiry(player.getWorld().getTime() + SinFragmentData.DURATION_L3_TICKS);
+                        SinFragmentManager.getData(player).setActiveSinExpiry(player.getWorld().getTime() + ModConfig.DURATION_L3_TICKS);
                         return sinType;
                     }
                     break;

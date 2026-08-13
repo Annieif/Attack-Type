@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import org.attack_type.api.ResistanceProfile;
 import org.attack_type.api.SinType;
 import org.attack_type.component.ResistanceManager;
+import org.attack_type.config.ModConfig;
 import org.attack_type.enchantment.ModEnchantments;
 import org.attack_type.network.NetworkHandler;
 
@@ -79,9 +80,9 @@ public class SinFragmentManager {
         int baseCost;
         int duration;
         switch (level) {
-            case 1: baseCost = SinFragmentData.COST_LEVEL_1; duration = SinFragmentData.DURATION_L1_TICKS; break;
-            case 2: baseCost = SinFragmentData.COST_LEVEL_2; duration = SinFragmentData.DURATION_L2_TICKS; break;
-            case 3: baseCost = SinFragmentData.COST_LEVEL_3; duration = SinFragmentData.DURATION_L3_TICKS; break;
+            case 1: baseCost = ModConfig.COST_LEVEL_1; duration = ModConfig.DURATION_L1_TICKS; break;
+            case 2: baseCost = ModConfig.COST_LEVEL_2; duration = ModConfig.DURATION_L2_TICKS; break;
+            case 3: baseCost = ModConfig.COST_LEVEL_3; duration = ModConfig.DURATION_L3_TICKS; break;
             default: return false;
         }
 
@@ -140,12 +141,12 @@ public class SinFragmentManager {
         data.addFragments(type, amount);
 
         int newCount = data.getFragments(type);
-        if (newCount >= 500 && !data.hasThresholdReached(type)) {
+        if (newCount >= ModConfig.OVERFLOW_THRESHOLD && !data.hasThresholdReached(type)) {
             data.markThresholdReached(type);
             if (player instanceof LivingEntity) {
                 LivingEntity living = (LivingEntity) player;
                 ResistanceProfile profile = ResistanceManager.getOrCreateProfile(living);
-                float newProduct = Math.max(0.1f, profile.getTotalProduct() - 0.1f);
+                float newProduct = (float) Math.max(ModConfig.TOTAL_PRODUCT_MIN, profile.getTotalProduct() - ModConfig.TOTAL_PRODUCT_DECAY_RATE);
                 profile.setTotalProduct(newProduct);
                 profile.normalize();
                 if (living instanceof ServerPlayerEntity) {
