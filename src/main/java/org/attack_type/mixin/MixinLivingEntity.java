@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import org.attack_type.api.AttackType;
 import org.attack_type.api.AttackTypeMapper;
@@ -17,7 +18,9 @@ import org.attack_type.component.ResistanceManager;
 import org.attack_type.enchantment.ModEnchantments;
 import org.attack_type.enchantment.PhysicalResistanceEnchantment;
 import org.attack_type.fragment.SinFragmentAcquisition;
+import org.attack_type.fragment.SinFragmentData;
 import org.attack_type.fragment.SinFragmentManager;
+import org.attack_type.network.NetworkHandler;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -181,24 +184,39 @@ public abstract class MixinLivingEntity {
     }
 
     /**
-     * 持久化抗性数据到 NBT。
+     * 持久化抗性和碎片数据到 NBT。
      */
     @Inject(method = "writeCustomDataToNbt", at = @At("RETURN"))
     private void onWriteNbt(NbtCompound nbt, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
-        ResistanceProfile profile = ResistanceManager.getProfile(self);
-        nbt.put("attack_type_resistance", profile.writeNbt(new NbtCompound()));
+        if (self instanceof PlayerEntity) {
+            ResistanceProfile profile = ResistanceManager.getProfile(self);
+            nbt.put("attack_type_resistance", profile.writeNbt(new NbtCompound()));
+            SinFragmentData data = SinFragmentManager.getData((PlayerEntity) self);
+            nbt.put("attack_type_fragments", data.writeNbt(new NbtCompound()));
+        }
     }
 
     /**
-     * 从 NBT 恢复抗性数据。
+     * 从 NBT 恢复抗性和碎片数据。
      */
     @Inject(method = "readCustomDataFromNbt", at = @At("RETURN"))
     private void onReadNbt(NbtCompound nbt, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (nbt.contains("attack_type_resistance")) {
-            ResistanceProfile profile = ResistanceProfile.readNbt(nbt.getCompound("attack_type_resistance"));
-            ResistanceManager.setProfile(self, profile);
+        if (self instanceof PlayerEntity) {
+            if (nbt.contains("attack_type_resistance")) {
+                ResistanceProfile profile = ResistanceProfile.readNbt(nbt.getCompound("attack_type_resistance"));
+                ResistanceManager.setProfile(self, profile);
+            }
+            if (nbt.contains("attack_type_fragments")) {
+                SinFragmentData data = new SinFragmentData();
+                data.readNbt(nbt.getCompound("attack_type_fragments"));
+                SinFragmentManager.setData(self.getUuid(), data);
+            }
+            if (self instanceof ServerPlayerEntity sp) {
+                NetworkHandler.sendResistanceSync(sp);
+                NetworkHandler.sendFragmentSync(sp);
+            }
         }
     }
 

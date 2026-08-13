@@ -173,10 +173,10 @@ public class SinFragmentAcquisition {
     // ==================== GLOOM 忧郁 — 受伤与目击 ====================
 
     private static void registerGloom() {
-        // 玩家受到伤害时
+        // 玩家受到伤害时（每10点伤害 +1 忧郁碎片）
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (entity instanceof ServerPlayerEntity player) {
-                int gloomFrag = (int) Math.ceil(amount);
+                int gloomFrag = (int) Math.ceil(amount / 10.0);
                 if (gloomFrag > 0) {
                     SinFragmentManager.addFragments(player, SinType.GLOOM, gloomFrag);
                     NetworkHandler.sendFragmentSync(player);
@@ -185,13 +185,13 @@ public class SinFragmentAcquisition {
             return true;
         });
 
-        // 目击其他生物受伤
+        // 目击其他生物受伤（每10点伤害 +1 忧郁碎片）
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (entity.getWorld().isClient) return true;
             if (entity instanceof PlayerEntity) return true;
             if (source.getAttacker() instanceof PlayerEntity) return true;
 
-            int gloomFrag = (int) Math.ceil(amount);
+            int gloomFrag = (int) Math.ceil(amount / 10.0);
             if (gloomFrag <= 0) return true;
 
             Box box = entity.getBoundingBox().expand(32);

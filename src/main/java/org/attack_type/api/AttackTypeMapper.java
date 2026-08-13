@@ -90,15 +90,16 @@ public class AttackTypeMapper {
             }
 
             for (SinType sinType : SinType.values()) {
-                if (SinFragmentManager.getData(player).isOverflowing(sinType)) {
-                    int cost = SinFragmentData.COST_LEVEL_1;
+                int frags = SinFragmentManager.getData(player).getFragments(sinType);
+                if (frags >= 100) {
+                    int cost = SinFragmentData.COST_LEVEL_3;
                     Enchantment enchant = ModEnchantments.getSinEnchantment(sinType);
                     int enchantLevel = enchant != null ? EnchantmentHelper.getLevel(enchant, player.getMainHandStack()) : 0;
                     cost = SinFragmentManager.getData(player).getCostWithEnchantment(cost, enchantLevel);
                     if (SinFragmentManager.getData(player).consumeFragments(sinType, cost)) {
                         SinFragmentManager.getData(player).setActiveSinType(sinType);
-                        SinFragmentManager.getData(player).setActiveSinLevel(1);
-                        SinFragmentManager.getData(player).setActiveSinExpiry(player.getWorld().getTime() + SinFragmentData.DURATION_L1_TICKS);
+                        SinFragmentManager.getData(player).setActiveSinLevel(3);
+                        SinFragmentManager.getData(player).setActiveSinExpiry(player.getWorld().getTime() + SinFragmentData.DURATION_L3_TICKS);
                         return sinType;
                     }
                     break;

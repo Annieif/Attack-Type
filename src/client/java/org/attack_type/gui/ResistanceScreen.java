@@ -185,7 +185,8 @@ public class ResistanceScreen extends Screen {
             TextFieldWidget tf = physicalFields.get(i);
             float raw = tryParse(tf.getText());
             float v = profile.getPhysicalResistance(atypes[i]);
-            product *= v;
+            float display = !Float.isNaN(raw) ? raw : v;
+            product *= !Float.isNaN(raw) ? raw : v;
             boolean overflow = !Float.isNaN(raw) && (raw < 0f || raw > CLAMP_MAX);
             overflows[i] = overflow;
             rawValues[i] = raw;
@@ -197,9 +198,9 @@ public class ResistanceScreen extends Screen {
             lyTexts[i] = lyText;
             context.drawTextWithShadow(textRenderer, label, labelX, lyText, 0xCCCCCC);
 
-            Text status = Text.translatable(v >= 1.0f ? "screen.attack_type.vulnerable" : "screen.attack_type.resist");
+            Text status = Text.translatable(ResistanceProfile.getResistanceLabel(display));
             context.drawTextWithShadow(textRenderer, status, statusX, lyText,
-                    v >= 1.0f ? 0xFF8888 : 0x88FF88);
+                    display >= 1.0f ? 0xFF8888 : 0x88FF88);
         }
 
         y += atypes.length * ROW_H + SECTION_GAP;
@@ -211,7 +212,8 @@ public class ResistanceScreen extends Screen {
             TextFieldWidget tf = sinFields.get(i);
             float raw = tryParse(tf.getText());
             float v = profile.getSinResistance(stypes[i]);
-            product *= v;
+            float display = !Float.isNaN(raw) ? raw : v;
+            product *= !Float.isNaN(raw) ? raw : v;
             boolean overflow = !Float.isNaN(raw) && (raw < 0f || raw > CLAMP_MAX);
             overflows[idx] = overflow;
             rawValues[idx] = raw;
@@ -223,9 +225,9 @@ public class ResistanceScreen extends Screen {
             lyTexts[idx] = lyText;
             context.drawTextWithShadow(textRenderer, label, labelX, lyText, 0xCCCCCC);
 
-            Text status = Text.translatable(v >= 1.0f ? "screen.attack_type.vulnerable" : "screen.attack_type.resist");
+            Text status = Text.translatable(ResistanceProfile.getResistanceLabel(display));
             context.drawTextWithShadow(textRenderer, status, statusX, lyText,
-                    v >= 1.0f ? 0xFF8888 : 0x88FF88);
+                    display >= 1.0f ? 0xFF8888 : 0x88FF88);
         }
 
         y = sinStartY + stypes.length * ROW_H + SECTION_GAP - 4;

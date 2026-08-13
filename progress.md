@@ -180,6 +180,28 @@
 - 附魔系统默认参数（sin + physicalResistance）
 - 伤害公式参考
 
+## 会话 6: 2026-08-11
+
+### 阶段34: 6项Bug修复（完成）
+
+**修复内容：**
+
+| Bug | 文件 | 修复 |
+|-----|------|------|
+| GUI 抗性描述不实时更新 | ResistanceScreen.java | 使用用户输入值(raw)替代存储值(v)，应用 getResistanceLabel() |
+| 退出重进数据丢失 | MixinLivingEntity.java, SinFragmentManager.java | NBT 读写碎片数据 + 恢复后自动同步 + 新增 setData() 方法 |
+| 忧郁碎片过快 | SinFragmentAcquisition.java | `Math.ceil(amount)` → `Math.ceil(amount / 10.0)` |
+| 溢出未持续触发Lv.3 | AttackTypeMapper.java | 阈值改为≥100、等级改为Lv.3、消耗100碎片 |
+| 总积衰减未应用 | SinFragmentManager.java | `setTotalProduct` 后调用 `normalize()` |
+| 碎片溢出变负数 | SinFragmentData.java | `long` 中间值，钳制 [0, 1000000] |
+
+**构建结果：**
+- BUILD SUCCESSFUL
+
+### 长期计划制定（完成）
+- 更新 task_plan.md：阶段34完成 + 短期TODO(S1-S4) + 长期发展计划(35-42)
+- 长期计划覆盖：配置系统、多人适配、视觉增强、成就系统、内容扩展、Mod兼容、发布准备、性能优化
+
 ## 会话 5: 2026-08-11
 
 ### 阶段30: 罪孽碎片获取系统 + 粒子效果 + QoL（完成）

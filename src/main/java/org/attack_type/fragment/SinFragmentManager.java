@@ -53,6 +53,16 @@ public class SinFragmentManager {
     }
 
     /**
+     * 直接设置玩家的碎片数据（用于 NBT 恢复）。
+     *
+     * @param uuid 玩家 UUID
+     * @param data 碎片数据
+     */
+    public static void setData(UUID uuid, SinFragmentData data) {
+        PLAYER_DATA.put(uuid, data);
+    }
+
+    /**
      * 尝试手动触发罪孽攻击。
      * <p>
      * 消耗公式：{@code max(1, baseCost(level) - 2 × enchantLevel)}。
@@ -137,6 +147,7 @@ public class SinFragmentManager {
                 ResistanceProfile profile = ResistanceManager.getOrCreateProfile(living);
                 float newProduct = Math.max(0.1f, profile.getTotalProduct() - 0.1f);
                 profile.setTotalProduct(newProduct);
+                profile.normalize();
                 if (living instanceof ServerPlayerEntity) {
                     ServerPlayerEntity sp = (ServerPlayerEntity) living;
                     ResistanceManager.syncToPlayer(sp);

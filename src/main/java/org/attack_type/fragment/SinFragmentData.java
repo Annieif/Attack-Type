@@ -70,10 +70,13 @@ public class SinFragmentData {
     }
 
     /**
-     * 增加指定罪孽类型的碎片数量（可负值）。
+     * 增加指定罪孽类型的碎片数量（可负值，自动钳制到 [0, 1000000] 防溢出）。
      */
     public void addFragments(SinType type, int amount) {
-        fragments.merge(type, amount, Integer::sum);
+        fragments.merge(type, amount, (a, b) -> {
+            long sum = (long) a + (long) b;
+            return (int) Math.max(0, Math.min(1000000, sum));
+        });
     }
 
     /**
