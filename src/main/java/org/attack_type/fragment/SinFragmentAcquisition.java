@@ -46,10 +46,13 @@ public class SinFragmentAcquisition {
     private static final Map<UUID, Integer> CRAFTED_COUNT = new HashMap<>();
     /** 嫉妒攀比检测计时器（ENVY） */
     private static final Map<UUID, Integer> ENVY_TIMER = new HashMap<>();
+    /** 鸡蛋上次使用时间（LUST 冷却） */
+    private static final Map<UUID, Long> LAST_EGG_TIME = new HashMap<>();
 
-    private static final int PRIDE_CRAFT_THRESHOLD = 27 * 64; // 27组 = 1728
+    private static final int PRIDE_CRAFT_THRESHOLD = 9 * 64; // 9组 = 576
     private static final int AFK_INTERVAL_TICKS = 20 * 60; // 1分钟 = 1200 ticks
     private static final int ENVY_INTERVAL_TICKS = 20 * 60; // 1分钟
+    private static final int EGG_COOLDOWN_TICKS = 20 * 5; // 5秒冷却
 
     /**
      * 注册所有碎片获取事件监听器。在模组初始化时调用。
@@ -98,13 +101,18 @@ public class SinFragmentAcquisition {
         // 僵尸村民治愈由 MixinZombieVillagerEntity 处理
         // 僵尸转溺尸由 MixinZombieEntity 处理
 
-        // 使用物品：鸡蛋
+        // 使用物品：鸡蛋（5秒冷却）
         UseItemCallback.EVENT.register((player, world, hand) -> {
             if (world.isClient) return TypedActionResult.pass(player.getStackInHand(hand));
             ItemStack stack = player.getStackInHand(hand);
             if (stack.getItem() == Items.EGG) {
-                SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.LUST, 1);
-                NetworkHandler.sendFragmentSync((ServerPlayerEntity) player);
+                long now = world.getTime();
+                Long last = LAST_EGG_TIME.get(player.getUuid());
+                if (last == null || now - last >= EGG_COOLDOWN_TICKS) {
+                    LAST_EGG_TIME.put(player.getUuid(), now);
+                    SinFragmentManager.addFragments((ServerPlayerEntity) player, SinType.LUST, 1);
+                    NetworkHandler.sendFragmentSync((ServerPlayerEntity) player);
+                }
             }
             return TypedActionResult.pass(stack);
         });
@@ -141,7 +149,7 @@ public class SinFragmentAcquisition {
                 if (!moved && !player.isSprinting() && player.isOnGround()) {
                     ticks++;
                     if (ticks >= AFK_INTERVAL_TICKS) {
-                        SinFragmentManager.addFragments(player, SinType.SLOTH, 1);
+                        SinFragmentManager.addFragments(player, SinType.SLOTH, 3);
                         NetworkHandler.sendFragmentSync(player);
                         AFK_TICKS.put(uuid, 0);
                     } else {
@@ -311,7 +319,7 @@ public class SinFragmentAcquisition {
                         if (entity instanceof PlayerEntity otherPlayer) {
                             int otherTier = getPlayerBestTier(otherPlayer);
                             if (otherTier > myTier) {
-                                SinFragmentManager.addFragments(player, SinType.ENVY, 2);
+                                SinFragmentManager.addFragments(player, SinType.ENVY, 3);
                                 NetworkHandler.sendFragmentSync(player);
                                 break;
                             }
