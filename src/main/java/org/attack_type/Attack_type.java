@@ -65,6 +65,7 @@ public class Attack_type implements ModInitializer {
                         ResistanceManager.tickEntityResistance(living, world.getTime());
                     }
                 });
+                SinFragmentManager.flushDirtyPlayers(world);
             });
         });
 

@@ -249,3 +249,18 @@
 - 构建: **BUILD SUCCESSFUL**
 
 **阶段30 全部完成！**
+
+## 会话 7: 2026-08-13
+
+### 阶段35: 配置系统重构（完成）
+- 35a: 创建 `config.json` + `ModConfig.java`，迁移所有硬编码常量
+- 35b: 实现 `/attacktype reload` 热重载指令
+- 35c: 创建 `easy.json`/`hard.json` 预设 + `/attacktype preset <name>`
+
+### 阶段36: 多人游戏适配（完成）
+- 36a: 并发安全加固 — `SinFragmentManager.addFragments()`/`tryTriggerSin()` 加 `synchronized(data)` 锁
+- 36b: 网络包优化 — 脏标记 `DIRTY_PLAYERS` + `ServerTickEvents.END_SERVER_TICK` 批量刷新，每 tick 最多一次
+- 36c: 权限系统 — 玩家级(0): `get`/`fragment get`(自身)；管理员级(2): 其余全部
+
+**修改文件：** SinFragmentManager.java, Attack_type.java, ResistanceCommand.java
+**构建结果：** BUILD SUCCESSFUL

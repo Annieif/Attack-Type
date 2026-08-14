@@ -32,15 +32,24 @@ import java.util.List;
 /**
  * 攻击类型系统管理命令。
  * <p>
- * 注册 {@code /attacktype} 根命令（权限等级 2），包含以下子命令：
+ * 注册 {@code /attacktype} 根命令，包含以下子命令（权限分级）：
+ * <h4>玩家级（无需 OP）</h4>
  * <ul>
- *   <li>{@code /attacktype get [target]} — 查看实体抗性</li>
+ *   <li>{@code /attacktype get} — 查看自己的抗性</li>
+ *   <li>{@code /attacktype fragment get} — 查看自己的碎片数据</li>
+ * </ul>
+ * <h4>管理员级（权限等级 2）</h4>
+ * <ul>
+ *   <li>{@code /attacktype get <target>} — 查看其他实体抗性</li>
  *   <li>{@code /attacktype set <type> <value> [target]} — 设置抗性值</li>
  *   <li>{@code /attacktype reset [target]} — 重置抗性为默认</li>
  *   <li>{@code /attacktype tick [target]} — 手动触发一次抗性衰减</li>
- *   <li>{@code /attacktype fragment get [target]} — 查看碎片数据</li>
+ *   <li>{@code /attacktype fragment get <target>} — 查看其他玩家碎片</li>
  *   <li>{@code /attacktype fragment add <type> <amount> [target]} — 增加碎片</li>
  *   <li>{@code /attacktype fragment set <type> <amount> [target]} — 设置碎片</li>
+ *   <li>{@code /attacktype test} — 生成测试狼</li>
+ *   <li>{@code /attacktype reload} — 热重载配置</li>
+ *   <li>{@code /attacktype preset <easy|normal|hard>} — 切换预设</li>
  * </ul>
  */
 public class ResistanceCommand {
@@ -52,12 +61,13 @@ public class ResistanceCommand {
      */
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("attacktype")
-                .requires(source -> source.hasPermissionLevel(2))
                 .then(CommandManager.literal("get")
                         .executes(ctx -> getResistance(ctx, ctx.getSource().getPlayerOrThrow()))
                         .then(CommandManager.argument("target", EntityArgumentType.entity())
+                                .requires(source -> source.hasPermissionLevel(2))
                                 .executes(ctx -> getResistance(ctx, EntityArgumentType.getEntity(ctx, "target")))))
                 .then(CommandManager.literal("set")
+                        .requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.argument("type", StringArgumentType.word())
                                 .suggests((ctx, builder) -> {
                                     for (AttackType type : AttackType.values()) {
@@ -73,10 +83,12 @@ public class ResistanceCommand {
                                         .then(CommandManager.argument("target", EntityArgumentType.entity())
                                                 .executes(ctx -> setResistance(ctx, EntityArgumentType.getEntity(ctx, "target")))))))
                 .then(CommandManager.literal("reset")
+                        .requires(source -> source.hasPermissionLevel(2))
                         .executes(ctx -> resetResistance(ctx, ctx.getSource().getPlayerOrThrow()))
                         .then(CommandManager.argument("target", EntityArgumentType.entity())
                                 .executes(ctx -> resetResistance(ctx, EntityArgumentType.getEntity(ctx, "target")))))
                 .then(CommandManager.literal("tick")
+                        .requires(source -> source.hasPermissionLevel(2))
                         .executes(ctx -> tickResistance(ctx, ctx.getSource().getPlayerOrThrow()))
                         .then(CommandManager.argument("target", EntityArgumentType.entity())
                                 .executes(ctx -> tickResistance(ctx, EntityArgumentType.getEntity(ctx, "target")))))
@@ -86,12 +98,15 @@ public class ResistanceCommand {
                         .then(buildFragmentSet())
                 )
                 .then(CommandManager.literal("test")
+                        .requires(source -> source.hasPermissionLevel(2))
                         .executes(ResistanceCommand::spawnTestDogs)
                 )
                 .then(CommandManager.literal("reload")
+                        .requires(source -> source.hasPermissionLevel(2))
                         .executes(ResistanceCommand::reloadConfig)
                 )
                 .then(CommandManager.literal("preset")
+                        .requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.argument("name", StringArgumentType.word())
                                 .suggests((ctx, builder) -> {
                                     builder.suggest("easy");
@@ -109,11 +124,13 @@ public class ResistanceCommand {
         return CommandManager.literal("get")
                 .executes(ctx -> fragmentGet(ctx, ctx.getSource().getPlayerOrThrow()))
                 .then(CommandManager.argument("target", EntityArgumentType.player())
+                        .requires(source -> source.hasPermissionLevel(2))
                         .executes(ctx -> fragmentGet(ctx, EntityArgumentType.getPlayer(ctx, "target"))));
     }
 
     private static LiteralArgumentBuilder<ServerCommandSource> buildFragmentAdd() {
         return CommandManager.literal("add")
+                .requires(source -> source.hasPermissionLevel(2))
                 .then(CommandManager.argument("type", StringArgumentType.word())
                         .suggests((ctx, builder) -> {
                             for (SinType type : SinType.values()) {
@@ -129,6 +146,7 @@ public class ResistanceCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> buildFragmentSet() {
         return CommandManager.literal("set")
+                .requires(source -> source.hasPermissionLevel(2))
                 .then(CommandManager.argument("type", StringArgumentType.word())
                         .suggests((ctx, builder) -> {
                             for (SinType type : SinType.values()) {
