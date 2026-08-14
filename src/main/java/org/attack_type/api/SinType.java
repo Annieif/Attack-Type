@@ -16,13 +16,23 @@ package org.attack_type.api;
  * </ul>
  */
 public enum SinType {
-    WRATH,
-    LUST,
-    SLOTH,
-    GLUTTONY,
-    GLOOM,
-    PRIDE,
-    ENVY;
+    WRATH(0xFF4444),
+    LUST(0xFF8800),
+    SLOTH(0xFFFF44),
+    GLUTTONY(0x44FF44),
+    GLOOM(0x44CCFF),
+    PRIDE(0x4444FF),
+    ENVY(0xCC44FF);
+
+    private final int color;
+
+    SinType(int color) {
+        this.color = color;
+    }
+
+    public int getColor() {
+        return color;
+    }
 
     /**
      * @return 国际化翻译键，格式为 {@code sin.attack_type.<小写名称>}

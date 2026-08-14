@@ -8,6 +8,8 @@ import net.minecraft.entity.LivingEntity;
 import org.attack_type.command.ResistanceCommand;
 import org.attack_type.component.ResistanceManager;
 import org.attack_type.config.ModConfig;
+import org.attack_type.effect.ModPotions;
+import org.attack_type.effect.ModStatusEffects;
 import org.attack_type.enchantment.ModEnchantments;
 import org.attack_type.fragment.SinFragmentAcquisition;
 import org.attack_type.fragment.SinFragmentManager;
@@ -37,6 +39,8 @@ public class Attack_type implements ModInitializer {
     @Override
     public void onInitialize() {
         ModEnchantments.initialize();
+        ModStatusEffects.initialize();
+        ModPotions.initialize();
         NetworkHandler.registerServer();
         ModConfig.load();
         SinFragmentAcquisition.register();
