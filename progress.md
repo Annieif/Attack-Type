@@ -264,3 +264,12 @@
 
 **修改文件：** SinFragmentManager.java, Attack_type.java, ResistanceCommand.java
 **构建结果：** BUILD SUCCESSFUL
+
+### 阶段37: 视觉与反馈增强（完成）
+- 37a: 粒子效果增强 — `spawnSinParticles` 接收 `sinLevel` 参数，粒子数=4+4*level, 大小=0.3+0.3*level, 扩散=0.5+0.2*level
+- 37b: 音效系统 — 罪孽攻击命中时播放 `ENTITY_WARDEN_SONIC_BOOM`，音量 0.3+0.1*level, 音高 0.8+0.2*level
+- 37c: 屏幕震动 — 被罪孽攻击命中时应用 `NAUSEA` 效果，持续 20*level ticks
+- 37d: 伤害数字 — `AreaEffectCloudEntity` 带彩色自定义名称，颜色对应罪孽类型，20 tick 后自动消失
+
+**修改文件：** MixinLivingEntity.java (新增 4 个 import, 修改 2 个方法, 新增 1 个方法)
+**构建结果：** BUILD SUCCESSFUL

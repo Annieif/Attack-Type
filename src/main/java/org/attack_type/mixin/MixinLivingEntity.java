@@ -1,15 +1,23 @@
 package org.attack_type.mixin;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.minecraft.util.math.Vec3d;
 import org.attack_type.api.AttackType;
 import org.attack_type.api.AttackTypeMapper;
 import org.attack_type.api.ResistanceProfile;
@@ -108,10 +116,21 @@ public abstract class MixinLivingEntity {
                 float sinDamage = (sinLevel * 3.0f + 1.0f) * profile.getSinResistance(sinType);
                 PENDING_SIN_DAMAGE.set(sinDamage);
 
-                // 粒子效果 + 嫉妒目击通知
                 if (!self.getWorld().isClient) {
-                    spawnSinParticles((ServerWorld) self.getWorld(), self.getX(), self.getY() + self.getHeight() / 2, self.getZ(), sinType);
+                    ServerWorld sw = (ServerWorld) self.getWorld();
+                    spawnSinParticles(sw, self.getX(), self.getY() + self.getHeight() / 2, self.getZ(), sinType, sinLevel);
                     SinFragmentAcquisition.notifySinAttackWitnessed(self.getWorld(), self.getPos());
+
+                    sw.playSound(null, self.getX(), self.getY(), self.getZ(),
+                            SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE,
+                            0.3f + 0.1f * sinLevel, 0.8f + 0.2f * sinLevel);
+
+                    self.addStatusEffect(new StatusEffectInstance(
+                            StatusEffects.NAUSEA, 20 * sinLevel, 0,
+                            false, false, true));
+
+                    spawnDamageNumber(sw, self.getPos().add(0, self.getHeight() + 0.5, 0),
+                            sinType, sinDamage);
                 }
             } else {
                 PENDING_SIN_DAMAGE.set(0.0f);
@@ -242,16 +261,22 @@ public abstract class MixinLivingEntity {
      *   <li>傲慢 PRIDE — 深蓝 (0.1, 0.2, 0.8)</li>
      *   <li>嫉妒 ENVY — 紫色 (0.6, 0.2, 1.0)</li>
      * </ul>
-     * 在目标实体周围生成 12 个粒子，粒子生命 20 tick。
+     * 粒子数量与大小随等级递增：
+     * <ul>
+     *   <li>Lv.1 — 8 粒子, size 0.6</li>
+     *   <li>Lv.2 — 16 粒子, size 1.2</li>
+     *   <li>Lv.3 — 24 粒子, size 1.8</li>
+     * </ul>
      *
-     * @param world   服务端世界
-     * @param x       目标 X 坐标
-     * @param y       目标 Y 坐标（身体中心）
-     * @param z       目标 Z 坐标
-     * @param sinType 罪孽类型
+     * @param world    服务端世界
+     * @param x        目标 X 坐标
+     * @param y        目标 Y 坐标（身体中心）
+     * @param z        目标 Z 坐标
+     * @param sinType  罪孽类型
+     * @param sinLevel 罪孽等级（1/2/3）
      */
     @Unique
-    private static void spawnSinParticles(ServerWorld world, double x, double y, double z, SinType sinType) {
+    private static void spawnSinParticles(ServerWorld world, double x, double y, double z, SinType sinType, int sinLevel) {
         Vector3f color = switch (sinType) {
             case WRATH -> new Vector3f(1.0f, 0.2f, 0.2f);     // 红
             case LUST -> new Vector3f(1.0f, 0.5f, 0.0f);       // 橙
@@ -261,12 +286,42 @@ public abstract class MixinLivingEntity {
             case PRIDE -> new Vector3f(0.1f, 0.2f, 0.8f);      // 深蓝
             case ENVY -> new Vector3f(0.6f, 0.2f, 1.0f);       // 紫
         };
-        DustParticleEffect effect = new DustParticleEffect(color, 1.0f);
-        for (int i = 0; i < 12; i++) {
-            double ox = x + (world.random.nextDouble() - 0.5) * 0.8;
-            double oy = y + (world.random.nextDouble() - 0.5) * 0.8;
-            double oz = z + (world.random.nextDouble() - 0.5) * 0.8;
+        int particleCount = 4 + sinLevel * 4;
+        float particleSize = 0.3f + sinLevel * 0.3f;
+        float spread = 0.5f + sinLevel * 0.2f;
+        DustParticleEffect effect = new DustParticleEffect(color, particleSize);
+        for (int i = 0; i < particleCount; i++) {
+            double ox = x + (world.random.nextDouble() - 0.5) * spread;
+            double oy = y + (world.random.nextDouble() - 0.5) * spread;
+            double oz = z + (world.random.nextDouble() - 0.5) * spread;
             world.spawnParticles(effect, ox, oy, oz, 1, 0, 0, 0, 0);
         }
+    }
+
+    /**
+     * 生成浮动伤害数字。
+     * <p>
+     * 使用 {@link AreaEffectCloudEntity} + 自定义名称在目标头顶显示罪孽伤害数值，
+     * 文字颜色与罪孽类型对应，1 秒后自动消失。
+     */
+    @Unique
+    private static void spawnDamageNumber(ServerWorld world, Vec3d pos, SinType sinType, float damage) {
+        AreaEffectCloudEntity cloud = new AreaEffectCloudEntity(world, pos.x, pos.y, pos.z);
+        int colorRgb = switch (sinType) {
+            case WRATH -> 0xFF3333;
+            case LUST -> 0xFF8000;
+            case SLOTH -> 0xFFE600;
+            case GLUTTONY -> 0x33CC33;
+            case GLOOM -> 0x33B3FF;
+            case PRIDE -> 0x1A33CC;
+            case ENVY -> 0x9933FF;
+        };
+        cloud.setCustomName(Text.literal(String.format("%.1f", damage))
+                .styled(style -> style.withColor(TextColor.fromRgb(colorRgb))));
+        cloud.setCustomNameVisible(true);
+        cloud.setDuration(20);
+        cloud.setRadius(0.0f);
+        cloud.setNoGravity(true);
+        world.spawnEntity(cloud);
     }
 }
