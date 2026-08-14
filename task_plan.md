@@ -88,7 +88,7 @@
 |---|------|------|
 | 35a | 统一配置文件 | ✅ 创建 `config.json` + `ModConfig.java`，迁移所有硬编码常量 |
 | 35b | 热重载指令 | ✅ `/attacktype reload` 运行时重载配置 |
-| 35c | 预设系统 | 提供"默认/困难/简单"等预设配置 |
+| 35c | 预设系统 | ✅ `easy.json`/`hard.json` + `/attacktype preset <name>` |
 
 ### 阶段36 — 多人游戏适配
 **目标：** 确保模组在多人服务器上稳定运行。
