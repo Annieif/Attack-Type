@@ -108,6 +108,23 @@ public final class ModConfig {
         }
     }
 
+    public static boolean loadPreset(String name) {
+        String path = "assets/attack_type/presets/" + name + ".json";
+        InputStream is = Attack_type.class.getClassLoader().getResourceAsStream(path);
+        if (is == null) {
+            LOGGER.warn("[AttackType] Preset '{}' not found", name);
+            return false;
+        }
+        try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            parse(JsonParser.parseReader(reader).getAsJsonObject());
+            LOGGER.info("[AttackType] Loaded preset: {}", name);
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("[AttackType] Failed to load preset '{}'", name, e);
+            return false;
+        }
+    }
+
     private static void parse(JsonObject root) {
         JsonObject costs = root.getAsJsonObject("fragmentCosts");
         if (costs != null) {

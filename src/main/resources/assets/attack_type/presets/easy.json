@@ -1,0 +1,64 @@
+{
+  "_comment": "Attack Type Mod — 简单预设",
+
+  "fragmentCosts": {
+    "level1": 20,
+    "level2": 50,
+    "level3": 75
+  },
+
+  "fragmentThresholds": {
+    "overflow": 800,
+    "kill": 1500
+  },
+
+  "fragmentDurations": {
+    "level1Ticks": 120,
+    "level2Ticks": 200,
+    "level3Ticks": 300
+  },
+
+  "fragmentAcquisition": {
+    "wrath": {
+      "killChainBonuses": [10, 7, 5, 3],
+      "killChainIntervals": [30, 60, 120, 240]
+    },
+    "lust": {
+      "eggCooldownTicks": 60,
+      "eggAmount": 2,
+      "breedAmount": 2,
+      "cureAmount": 15,
+      "convertAmount": 10,
+      "drownAmount": 10,
+      "lightningAmount": 10
+    },
+    "sloth": {
+      "afkIntervalTicks": 800,
+      "afkAmount": 5,
+      "sleepAmount": 10
+    },
+    "gluttony": {
+      "perFood": 2
+    },
+    "gloom": {
+      "damagePerFragment": 5,
+      "selfAmount": 2,
+      "witnessAmount": 2
+    },
+    "pride": {
+      "craftThreshold": 384,
+      "achievementAmount": 20,
+      "productionAmount": 5
+    },
+    "envy": {
+      "intervalTicks": 800,
+      "compareAmount": 5,
+      "witnessAmount": 2
+    }
+  },
+
+  "totalProduct": {
+    "decayRate": 0.05,
+    "minProduct": 0.2
+  }
+}

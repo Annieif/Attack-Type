@@ -91,6 +91,17 @@ public class ResistanceCommand {
                 .then(CommandManager.literal("reload")
                         .executes(ResistanceCommand::reloadConfig)
                 )
+                .then(CommandManager.literal("preset")
+                        .then(CommandManager.argument("name", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    builder.suggest("easy");
+                                    builder.suggest("normal");
+                                    builder.suggest("hard");
+                                    return builder.buildFuture();
+                                })
+                                .executes(ResistanceCommand::loadPreset)
+                        )
+                )
         );
     }
 
@@ -477,6 +488,18 @@ SinFragmentManager.getData(target).setFragments(sinType, amount);
         ctx.getSource().sendFeedback(
                 () -> Text.literal("[AttackType] Configuration reloaded."), true);
         return 1;
+    }
+
+    private static int loadPreset(CommandContext<ServerCommandSource> ctx) {
+        String name = StringArgumentType.getString(ctx, "name");
+        boolean ok = ModConfig.loadPreset(name);
+        if (ok) {
+            ctx.getSource().sendFeedback(
+                    () -> Text.literal("[AttackType] Loaded preset: " + name), true);
+            return 1;
+        }
+        ctx.getSource().sendError(Text.literal("Unknown preset: " + name + ". Available: easy, normal, hard"));
+        return 0;
     }
 
     /**
