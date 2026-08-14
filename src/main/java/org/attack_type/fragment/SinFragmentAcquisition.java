@@ -179,22 +179,18 @@ public class SinFragmentAcquisition {
     // ==================== GLOOM 忧郁 — 受伤与目击 ====================
 
     private static void registerGloom() {
-        // 玩家受到伤害时
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            if (entity.getWorld().isClient) return true;
+
             if (entity instanceof ServerPlayerEntity player) {
                 int gloomFrag = (int) Math.ceil(amount / (double) ModConfig.GLOOM_DAMAGE_PER_FRAGMENT);
                 if (gloomFrag > 0) {
                     SinFragmentManager.addFragments(player, SinType.GLOOM, gloomFrag * ModConfig.GLOOM_SELF_AMOUNT);
                     NetworkHandler.sendFragmentSync(player);
                 }
+                return true;
             }
-            return true;
-        });
 
-        // 目击其他生物受伤（每10点伤害 +1 忧郁碎片）
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
-            if (entity.getWorld().isClient) return true;
-            if (entity instanceof PlayerEntity) return true;
             if (source.getAttacker() instanceof PlayerEntity) return true;
 
             int gloomFrag = (int) Math.ceil(amount / (double) ModConfig.GLOOM_DAMAGE_PER_FRAGMENT);
@@ -213,22 +209,31 @@ public class SinFragmentAcquisition {
 
     // ==================== PRIDE 傲慢 — 成就与生产 ====================
 
+    private static final Map<UUID, Integer> PRIDE_TICK_COUNTER = new HashMap<>();
+
     private static void registerPride() {
-        // 每 tick 检测合成统计
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                UUID uuid = player.getUuid();
+                int counter = PRIDE_TICK_COUNTER.getOrDefault(uuid, 0) + 1;
+                if (counter < 100) {
+                    PRIDE_TICK_COUNTER.put(uuid, counter);
+                    continue;
+                }
+                PRIDE_TICK_COUNTER.put(uuid, 0);
+
                 int sum = 0;
                 for (net.minecraft.item.Item item : net.minecraft.registry.Registries.ITEM) {
                     sum += player.getStatHandler().getStat(Stats.CRAFTED.getOrCreateStat(item));
                 }
-                int prev = CRAFTED_COUNT.getOrDefault(player.getUuid(), 0);
+                int prev = CRAFTED_COUNT.getOrDefault(uuid, 0);
                 if (sum - prev >= ModConfig.PRIDE_CRAFT_THRESHOLD) {
                     int multiples = (sum - prev) / ModConfig.PRIDE_CRAFT_THRESHOLD;
                     SinFragmentManager.addFragments(player, SinType.PRIDE, multiples);
                     NetworkHandler.sendFragmentSync(player);
-                    CRAFTED_COUNT.put(player.getUuid(), prev + multiples * ModConfig.PRIDE_CRAFT_THRESHOLD);
+                    CRAFTED_COUNT.put(uuid, prev + multiples * ModConfig.PRIDE_CRAFT_THRESHOLD);
                 } else if (prev == 0 && sum > 0) {
-                    CRAFTED_COUNT.put(player.getUuid(), sum);
+                    CRAFTED_COUNT.put(uuid, sum);
                 }
             }
         });

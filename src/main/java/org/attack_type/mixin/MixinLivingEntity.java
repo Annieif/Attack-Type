@@ -24,6 +24,7 @@ import org.attack_type.api.AttackTypeMapper;
 import org.attack_type.api.ResistanceProfile;
 import org.attack_type.api.SinType;
 import org.attack_type.component.ResistanceManager;
+import org.attack_type.effect.*;
 import org.attack_type.enchantment.ModEnchantments;
 import org.attack_type.enchantment.PhysicalResistanceEnchantment;
 import org.attack_type.fragment.SinFragmentAcquisition;
@@ -118,6 +119,10 @@ public abstract class MixinLivingEntity {
             if (sinType != null) {
                 int sinLevel = AttackTypeMapper.getSinLevel(attacker);
                 float sinDamage = (sinLevel * 3.0f + 1.0f) * profile.getSinResistance(sinType);
+
+                sinDamage = applySinEffects(attacker, self, sinType, sinDamage);
+                physResistance = applyPhysEffects(attacker, self, sinType, physResistance);
+
                 PENDING_SIN_DAMAGE.set(sinDamage);
 
                 if (!self.getWorld().isClient) {
@@ -139,6 +144,8 @@ public abstract class MixinLivingEntity {
 
                     spawnDamageNumber(sw, self.getPos().add(0, self.getHeight() + 0.5, 0),
                             sinType, sinDamage);
+
+                    applyBurstThorns(sw, attacker, self);
                 }
             } else {
                 PENDING_SIN_DAMAGE.set(0.0f);
@@ -283,8 +290,97 @@ public abstract class MixinLivingEntity {
      * @param sinType  罪孽类型
      * @param sinLevel 罪孽等级（1/2/3）
      */
+    private static float applySinEffects(LivingEntity attacker, LivingEntity target, SinType sinType, float baseDamage) {
+        float damage = baseDamage;
+
+        SinCategoryEffect strengthen = ModStatusEffects.getSinEffect(sinType, EffectCategory.STRENGTHEN);
+        if (strengthen != null) {
+            StatusEffectInstance inst = attacker.getStatusEffect(strengthen);
+            if (inst != null) damage *= (1.0f + 0.3f * (inst.getAmplifier() + 1));
+        }
+
+        SinCategoryEffect weaken = ModStatusEffects.getSinEffect(sinType, EffectCategory.WEAKEN);
+        if (weaken != null) {
+            StatusEffectInstance inst = attacker.getStatusEffect(weaken);
+            if (inst != null) damage *= (1.0f - 0.3f * (inst.getAmplifier() + 1));
+        }
+
+        SinCategoryEffect guard = ModStatusEffects.getSinEffect(sinType, EffectCategory.GUARD);
+        if (guard != null) {
+            StatusEffectInstance inst = target.getStatusEffect(guard);
+            if (inst != null) damage *= (1.0f - 0.3f * (inst.getAmplifier() + 1));
+        }
+
+        SinCategoryEffect vulnerable = ModStatusEffects.getSinEffect(sinType, EffectCategory.VULNERABLE);
+        if (vulnerable != null) {
+            StatusEffectInstance inst = target.getStatusEffect(vulnerable);
+            if (inst != null) damage *= (1.0f + 0.3f * (inst.getAmplifier() + 1));
+        }
+
+        SinCategoryEffect boost = ModStatusEffects.getSinEffect(sinType, EffectCategory.BOOST);
+        if (boost != null) {
+            StatusEffectInstance inst = attacker.getStatusEffect(boost);
+            if (inst != null) damage += 2.0f * (inst.getAmplifier() + 1);
+        }
+
+        SinCategoryEffect reduce = ModStatusEffects.getSinEffect(sinType, EffectCategory.REDUCE);
+        if (reduce != null) {
+            StatusEffectInstance inst = target.getStatusEffect(reduce);
+            if (inst != null) damage -= 2.0f * (inst.getAmplifier() + 1);
+        }
+
+        return Math.max(0.0f, damage);
+    }
+
     @Unique
-    private static void spawnSinParticles(ServerWorld world, double x, double y, double z, SinType sinType, int sinLevel) {
+    private static float applyPhysEffects(LivingEntity attacker, LivingEntity target, SinType sinType, float physResistance) {
+        if (sinType != null) {
+            BurstEffect burst = ModStatusEffects.getBurstEffect(sinType);
+            if (burst != null) {
+                StatusEffectInstance inst = target.getStatusEffect(burst);
+                if (inst != null) {
+                    physResistance *= (1.0f - 0.5f * (inst.getAmplifier() + 1));
+                }
+            }
+        }
+
+        StatusEffectInstance ignoreInst = attacker.getStatusEffect(ModStatusEffects.IGNORE_RESISTANCE);
+        if (ignoreInst != null) {
+            float ignoreRatio = 0.25f * (ignoreInst.getAmplifier() + 1);
+            physResistance = physResistance * (1.0f - ignoreRatio) + ignoreRatio;
+        }
+
+        return Math.max(0.0f, physResistance);
+    }
+
+    @Unique
+    private static void applyBurstThorns(ServerWorld world, LivingEntity attacker, LivingEntity target) {
+        for (SinType sin : SinType.values()) {
+            BurstEffect burst = ModStatusEffects.getBurstEffect(sin);
+            if (burst == null) continue;
+            StatusEffectInstance inst = target.getStatusEffect(burst);
+            if (inst == null) continue;
+
+            int amplifier = inst.getAmplifier();
+            float thornsDamage = 3.0f * (amplifier + 1);
+
+            attacker.damage(world.getDamageSources().magic(), thornsDamage);
+
+            DustParticleEffect particle = new DustParticleEffect(
+                    new Vector3f((sin.getColor() >> 16) & 0xFF, (sin.getColor() >> 8) & 0xFF, sin.getColor() & 0xFF),
+                    1.5f);
+            for (int i = 0; i < 10; i++) {
+                world.spawnParticles(particle,
+                        attacker.getX() + (world.random.nextDouble() - 0.5) * 0.5,
+                        attacker.getY() + attacker.getHeight() / 2 + (world.random.nextDouble() - 0.5) * 0.5,
+                        attacker.getZ() + (world.random.nextDouble() - 0.5) * 0.5,
+                        1, 0, 0, 0, 0);
+            }
+        }
+    }
+
+    @Unique
+    private static void spawnSinParticles(ServerWorld world, double x, double y, double z, SinType sinType, int level) {
         Vector3f color = switch (sinType) {
             case WRATH -> new Vector3f(1.0f, 0.2f, 0.2f);     // 红
             case LUST -> new Vector3f(1.0f, 0.5f, 0.0f);       // 橙
@@ -294,9 +390,9 @@ public abstract class MixinLivingEntity {
             case PRIDE -> new Vector3f(0.1f, 0.2f, 0.8f);      // 深蓝
             case ENVY -> new Vector3f(0.6f, 0.2f, 1.0f);       // 紫
         };
-        int particleCount = 4 + sinLevel * 4;
-        float particleSize = 0.3f + sinLevel * 0.3f;
-        float spread = 0.5f + sinLevel * 0.2f;
+        int particleCount = 4 + level * 4;
+        float particleSize = 0.3f + level * 0.3f;
+        float spread = 0.5f + level * 0.2f;
         DustParticleEffect effect = new DustParticleEffect(color, particleSize);
         for (int i = 0; i < particleCount; i++) {
             double ox = x + (world.random.nextDouble() - 0.5) * spread;

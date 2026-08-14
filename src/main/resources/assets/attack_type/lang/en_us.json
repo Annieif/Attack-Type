@@ -338,5 +338,27 @@
   "item.minecraft.lingering_potion.effect.burst_pride": "Lingering Potion of Burst of Pride",
   "item.minecraft.potion.effect.burst_envy": "Potion of Burst of Envy",
   "item.minecraft.splash_potion.effect.burst_envy": "Splash Potion of Burst of Envy",
-  "item.minecraft.lingering_potion.effect.burst_envy": "Lingering Potion of Burst of Envy"
+  "item.minecraft.lingering_potion.effect.burst_envy": "Lingering Potion of Burst of Envy",
+
+  "item.minecraft.potion.effect.wrath_base": "Wrath Potion",
+  "item.minecraft.splash_potion.effect.wrath_base": "Splash Wrath Potion",
+  "item.minecraft.lingering_potion.effect.wrath_base": "Lingering Wrath Potion",
+  "item.minecraft.potion.effect.lust_base": "Lust Potion",
+  "item.minecraft.splash_potion.effect.lust_base": "Splash Lust Potion",
+  "item.minecraft.lingering_potion.effect.lust_base": "Lingering Lust Potion",
+  "item.minecraft.potion.effect.sloth_base": "Sloth Potion",
+  "item.minecraft.splash_potion.effect.sloth_base": "Splash Sloth Potion",
+  "item.minecraft.lingering_potion.effect.sloth_base": "Lingering Sloth Potion",
+  "item.minecraft.potion.effect.gluttony_base": "Gluttony Potion",
+  "item.minecraft.splash_potion.effect.gluttony_base": "Splash Gluttony Potion",
+  "item.minecraft.lingering_potion.effect.gluttony_base": "Lingering Gluttony Potion",
+  "item.minecraft.potion.effect.gloom_base": "Gloom Potion",
+  "item.minecraft.splash_potion.effect.gloom_base": "Splash Gloom Potion",
+  "item.minecraft.lingering_potion.effect.gloom_base": "Lingering Gloom Potion",
+  "item.minecraft.potion.effect.pride_base": "Pride Potion",
+  "item.minecraft.splash_potion.effect.pride_base": "Splash Pride Potion",
+  "item.minecraft.lingering_potion.effect.pride_base": "Lingering Pride Potion",
+  "item.minecraft.potion.effect.envy_base": "Envy Potion",
+  "item.minecraft.splash_potion.effect.envy_base": "Splash Envy Potion",
+  "item.minecraft.lingering_potion.effect.envy_base": "Lingering Envy Potion"
 }

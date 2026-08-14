@@ -346,6 +346,8 @@ src/
 │       └── NetworkHandlerClient.java           # Client network packet receiver
 ├── main/java/org/attack_type/
 │   ├── Attack_type.java                        # Mod main entry point
+│   ├── advancement/
+│   │   └── ModAdvancements.java                # Advancement system
 │   ├── api/
 │   │   ├── AttackType.java                     # Physical attack type enum
 │   │   ├── AttackTypeMapper.java               # Attack type/sin determination core
@@ -355,17 +357,29 @@ src/
 │   │   └── ResistanceCommand.java              # /attacktype debug commands
 │   ├── component/
 │   │   └── ResistanceManager.java              # Global resistance management + periodic decay
+│   ├── config/
+│   │   └── ModConfig.java                      # Global config (hot reload + presets)
+│   ├── effect/
+│   │   ├── BurstEffect.java                    # Burst effect (thorns + resistance adjustment + damage conversion)
+│   │   ├── CostIncreaseEffect.java             # Cost increase effect
+│   │   ├── EffectCategory.java                 # Effect category enum (strengthen/guard/boost/weaken/vulnerable/reduce)
+│   │   ├── FragmentBoostEffect.java            # Fragment boost effect
+│   │   ├── FragmentDrainEffect.java            # Fragment drain effect
+│   │   ├── IgnoreResistanceEffect.java         # Ignore resistance effect
+│   │   ├── ModPotions.java                     # Potion registry + two-stage brewing recipes
+│   │   ├── ModStatusEffects.java               # Status effect registry (60 effects)
+│   │   ├── NoCostEffect.java                   # No cost effect
+│   │   └── SinCategoryEffect.java              # Sin/physical category status effect
 │   ├── enchantment/
 │   │   ├── ModEnchantments.java                # Enchantment registry
 │   │   ├── PhysicalResistanceEnchantment.java  # Physical resistance armor enchantment
 │   │   └── SinEnchantment.java                 # Sin weapon enchantment
 │   ├── fragment/
 │   │   ├── SinFragmentAcquisition.java         # 7 sin fragment acquisition system
-│   │   ├── SinFragmentConfig.java              # Fragment system constants
 │   │   ├── SinFragmentData.java                # Fragment data model + consumption constants
 │   │   └── SinFragmentManager.java             # Fragment management (add/remove/trigger/overflow/kill)
 │   ├── mixin/
-│   │   ├── MixinLivingEntity.java              # LivingEntity damage calculation injection + particles
+│   │   ├── MixinLivingEntity.java              # LivingEntity damage calculation injection + particles + effects
 │   │   ├── MixinPlayerEntity.java              # Gluttony: allow eating at full hunger
 │   │   ├── MixinServerPlayerEntity.java        # Sloth: sleep anytime + sleep detection
 │   │   ├── MixinLightningStrike.java           # Lust: lightning strike mutation detection
@@ -395,6 +409,73 @@ src/
 | `resistance_update` | C→S       | Player submits resistance changes (10×float + totalProduct) |
 | `fragment_sync`     | S→C       | Full fragment NBT sync                         |
 | `fragment_trigger`  | C→S       | Manual sin trigger (ordinal + level)           |
+
+---
+
+## Status Effects & Potion System
+
+### Effect Categories
+
+The mod adds 60 status effects (StatusEffect) in three categories:
+
+#### Sin/Physical Category Effects (48 types)
+
+6 categories × (7 sins + 1 physical) = 48 types:
+
+| Category | Keyword | Effect | Formula |
+|----------|---------|--------|---------|
+| Strengthen | `strengthen` | Deal +N% damage of this type | `1 + 0.3 × (amplifier + 1)` |
+| Guard | `guard` | Take -N% damage of this type | `1 - 0.3 × (amplifier + 1)` |
+| Boost | `boost` | Add +N flat damage | `2 × (amplifier + 1)` |
+| Weaken | `weaken` | Deal -N% damage of this type | `1 - 0.3 × (amplifier + 1)` |
+| Vulnerable | `vulnerable` | Take +N% damage of this type | `1 + 0.3 × (amplifier + 1)` |
+| Reduce | `reduce` | Reduce flat damage by N | `2 × (amplifier + 1)` |
+
+#### Generic Effects (5 types)
+
+| Effect | Keyword | Description |
+|--------|---------|-------------|
+| Fragment Boost | `fragment_boost` | Gain +N extra fragments per acquisition |
+| No Cost | `no_cost` | Sin trigger costs no fragments |
+| Ignore Resistance | `ignore_resistance` | N% of damage ignores physical/sin resistance |
+| Fragment Drain | `fragment_drain` | Lose N fragments every 5 seconds |
+| Cost Increase | `cost_increase` | Sin trigger costs +N% more fragments |
+
+#### Burst Effects (7 types × 5 levels)
+
+Using "Burst of Gloom" as an example:
+
+| Effect | Formula |
+|--------|---------|
+| Sin Resistance | +0.3 × N |
+| Physical Resistance | -0.5 × N |
+| Thorns | Deal 3 × N sin damage to attacker when hit |
+| Damage Conversion | All incoming damage becomes sin-typed |
+
+### Brewing System
+
+Uses a **two-stage brewing** system:
+
+```
+Awkward Potion + Sin Material → Sin Base Potion → + Category Material → Specific Potion
+```
+
+| Sin | Base Material | Category Materials |
+|-----|--------------|-------------------|
+| Wrath | Blaze Rod | Fire Charge(Strengthen) / Iron Ingot(Guard) / Prismarine Crystals(Boost) / Poisonous Potato(Weaken) / String(Vulnerable) / Popped Chorus Fruit(Reduce) |
+| Lust | Rose Bush | Same as above |
+| Sloth | Feather | Same as above |
+| Gluttony | Rotten Flesh | Same as above |
+| Gloom | Ink Sac | Same as above |
+| Pride | Gold Ingot | Same as above |
+| Envy | Emerald | Same as above |
+| Burst | — | Echo Shard (added to sin base potion) |
+
+**Upgrades & Conversions:**
+- Glowstone Dust → +1 level (sin/physical/generic max Lv3, burst max Lv5)
+- Redstone → Extended duration (base 3min → extended 8min)
+- Gunpowder → Splash potion
+- Dragon's Breath → Lingering potion
 
 ---
 

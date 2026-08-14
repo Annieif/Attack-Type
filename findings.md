@@ -1,5 +1,36 @@
 # Attack Type Mod — 研究发现
 
+## 性能优化发现（阶段42）
+
+### EnumMap 查找表替代嵌套 switch
+
+**问题：** ModPotions 中 `getSinEffect()` 使用 42 分支嵌套 switch（6 个分类 × 7 种罪孽），每次查找 O(1) 但有大量代码冗余。
+
+**解决方案：** 在 ModStatusEffects 中引入 3 个 EnumMap：
+- `SIN_EFFECTS`: `Map<SinType, Map<EffectCategory, SinCategoryEffect>>` — 罪孽分类效果
+- `PHYS_EFFECTS`: `Map<EffectCategory, SinCategoryEffect>` — 物理分类效果
+- `BURST_EFFECTS`: `Map<SinType, BurstEffect>` — 爆发效果
+
+`regSin()`/`regPhys()`/`regBurst()` 在注册时自动填充查找表，`getSinEffect()`/`getPhysEffect()`/`getBurstEffect()` 提供 O(1) 查找。
+
+### 药水注册代码去重
+
+**问题：** `registerSinPotions`/`registerPhysPotions`/`registerGenericPotions` 三个方法中 Lv1/Lv2/Lv3/Long + 酿造配方代码重复。
+
+**解决方案：** 抽取 `registerPotionLevels()` 方法统一处理等级提升和配方注册。
+
+### 监听器合并
+
+**问题：** SinFragmentAcquisition 中 Gloom 碎片获取使用 2 个独立的 `ALLOW_DAMAGE` 监听器（玩家受伤 + 目击受伤）。
+
+**解决方案：** 合并为 1 个监听器，通过 `instanceof ServerPlayerEntity` 判断分支。
+
+### Tick 降频
+
+**问题：** Pride 傲慢碎片获取每 tick 扫描所有玩家的所有物品合成统计（`Registries.ITEM` 全量遍历），O(n × items) 每 tick 每玩家。
+
+**解决方案：** 添加 `PRIDE_TICK_COUNTER`，每 100 tick（5 秒）扫描一次，降低 99% 计算量。
+
 ## 项目结构
 
 - 加载器: Fabric 1.20.1 (Java 17)

@@ -180,6 +180,30 @@
 - 附魔系统默认参数（sin + physicalResistance）
 - 伤害公式参考
 
+## 会话 7: 2026-08-14
+
+### 阶段39 完成 + 阶段42 性能优化
+
+**状态效果逻辑集成（MixinLivingEntity.java）：**
+- 新增 `applySinEffects()`：攻击者 STRENGTHEN/WEAKEN/BOOST + 目标 GUARD/VULNERABLE/REDUCE 调整罪孽伤害
+- 新增 `applyPhysEffects()`：目标 BURST 效果物理抗性降低 + 攻击者 IGNORE_RESISTANCE 穿透
+- 新增 `applyBurstThorns()`：目标所有 BURST 效果反伤（每级 3 点）+ 粒子特效
+- 修复 `spawnSinParticles` 中 `sinLevel` → `level` 变量名不匹配
+- 修复 `applyBurstThorns` 中 `break` 导致只触发第一个爆发效果（改为遍历所有）
+- 移除 `applyBurstThorns` 未使用的 `attackerSin` 参数
+
+**性能优化（4 个文件）：**
+
+| 优化项 | 文件 | 改动 |
+|--------|------|------|
+| EnumMap 查找表 | ModStatusEffects.java | 3 个 EnumMap 替代 42 分支 switch-case，O(1) 查找 |
+| 药水注册去重 | ModPotions.java | 删除 42 分支 switch，抽取 registerPotionLevels() 消除重复代码 |
+| 监听器合并 | SinFragmentAcquisition.java | 2 个 ALLOW_DAMAGE 监听器合并为 1 个 |
+| Tick 降频 | SinFragmentAcquisition.java | Pride 扫描从每 tick 降为每 100 tick（5 秒） |
+
+**构建结果：**
+- BUILD SUCCESSFUL
+
 ## 会话 6: 2026-08-11
 
 ### 阶段34: 6项Bug修复（完成）

@@ -330,5 +330,27 @@
   "item.minecraft.lingering_potion.effect.burst_pride": "滞留型爆发的傲慢药水",
   "item.minecraft.potion.effect.burst_envy": "爆发的嫉妒药水",
   "item.minecraft.splash_potion.effect.burst_envy": "喷溅型爆发的嫉妒药水",
-  "item.minecraft.lingering_potion.effect.burst_envy": "滞留型爆发的嫉妒药水"
+  "item.minecraft.lingering_potion.effect.burst_envy": "滞留型爆发的嫉妒药水",
+
+  "item.minecraft.potion.effect.wrath_base": "暴怒药水",
+  "item.minecraft.splash_potion.effect.wrath_base": "喷溅型暴怒药水",
+  "item.minecraft.lingering_potion.effect.wrath_base": "滞留型暴怒药水",
+  "item.minecraft.potion.effect.lust_base": "色欲药水",
+  "item.minecraft.splash_potion.effect.lust_base": "喷溅型色欲药水",
+  "item.minecraft.lingering_potion.effect.lust_base": "滞留型色欲药水",
+  "item.minecraft.potion.effect.sloth_base": "怠惰药水",
+  "item.minecraft.splash_potion.effect.sloth_base": "喷溅型怠惰药水",
+  "item.minecraft.lingering_potion.effect.sloth_base": "滞留型怠惰药水",
+  "item.minecraft.potion.effect.gluttony_base": "暴食药水",
+  "item.minecraft.splash_potion.effect.gluttony_base": "喷溅型暴食药水",
+  "item.minecraft.lingering_potion.effect.gluttony_base": "滞留型暴食药水",
+  "item.minecraft.potion.effect.gloom_base": "忧郁药水",
+  "item.minecraft.splash_potion.effect.gloom_base": "喷溅型忧郁药水",
+  "item.minecraft.lingering_potion.effect.gloom_base": "滞留型忧郁药水",
+  "item.minecraft.potion.effect.pride_base": "傲慢药水",
+  "item.minecraft.splash_potion.effect.pride_base": "喷溅型傲慢药水",
+  "item.minecraft.lingering_potion.effect.pride_base": "滞留型傲慢药水",
+  "item.minecraft.potion.effect.envy_base": "嫉妒药水",
+  "item.minecraft.splash_potion.effect.envy_base": "喷溅型嫉妒药水",
+  "item.minecraft.lingering_potion.effect.envy_base": "滞留型嫉妒药水"
 }

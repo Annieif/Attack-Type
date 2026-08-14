@@ -316,6 +316,8 @@ src/
 │       └── NetworkHandlerClient.java       # 客户端网络包接收
 ├── main/java/org/attack_type/
 │   ├── Attack_type.java                    # 模组主入口
+│   ├── advancement/
+│   │   └── ModAdvancements.java            # 成就/进度系统
 │   ├── api/
 │   │   ├── AttackType.java                # 物理攻击类型枚举
 │   │   ├── AttackTypeMapper.java          # 攻击类型/罪孽判定核心逻辑
@@ -325,17 +327,29 @@ src/
 │   │   └── ResistanceCommand.java         # /attacktype 调试命令
 │   ├── component/
 │   │   └── ResistanceManager.java         # 全局抗性管理 + 周期衰减
+│   ├── config/
+│   │   └── ModConfig.java                 # 全局配置（热重载 + 预设）
+│   ├── effect/
+│   │   ├── BurstEffect.java               # 爆发效果（反伤 + 抗性调整 + 伤害转换）
+│   │   ├── CostIncreaseEffect.java        # 消耗增加效果
+│   │   ├── EffectCategory.java            # 效果分类枚举（强化/守护/提升/弱化/易损/降低）
+│   │   ├── FragmentBoostEffect.java       # 碎片获取增加效果
+│   │   ├── FragmentDrainEffect.java       # 碎片扣除效果
+│   │   ├── IgnoreResistanceEffect.java    # 无视抗性效果
+│   │   ├── ModPotions.java                # 药水注册 + 两段式酿造配方
+│   │   ├── ModStatusEffects.java          # 状态效果注册中心（60 个效果）
+│   │   ├── NoCostEffect.java              # 无消耗效果
+│   │   └── SinCategoryEffect.java         # 罪孽/物理分类状态效果
 │   ├── enchantment/
 │   │   ├── ModEnchantments.java           # 附魔注册中心
 │   │   ├── PhysicalResistanceEnchantment.java  # 物理抗性护甲附魔
 │   │   └── SinEnchantment.java            # 罪孽武器附魔
 │   ├── fragment/
 │   │   ├── SinFragmentAcquisition.java   # 7种罪孽碎片获取系统
-│   │   ├── SinFragmentConfig.java         # 碎片系统常量配置
 │   │   ├── SinFragmentData.java           # 碎片数据模型 + 消耗常量
 │   │   └── SinFragmentManager.java        # 碎片管理（增删/触发/溢出/即死）
 │   ├── mixin/
-│   │   ├── MixinLivingEntity.java         # LivingEntity 伤害计算注入 + 粒子效果
+│   │   ├── MixinLivingEntity.java         # LivingEntity 伤害计算注入 + 粒子 + 效果集成
 │   │   ├── MixinPlayerEntity.java         # 暴食：允许满饱食度进食
 │   │   ├── MixinServerPlayerEntity.java   # 怠惰：随时睡觉 + 睡眠检测
 │   │   ├── MixinLightningStrike.java      # 色欲：闪电击中变异检测
@@ -364,6 +378,73 @@ src/
 | `resistance_update` | C→S | 玩家提交抗性修改（10×float + totalProduct） |
 | `fragment_sync`     | S→C | 碎片数据 NBT 全量同步                     |
 | `fragment_trigger`  | C→S | 手动触发罪孽（ordinal + level）           |
+
+---
+
+## 状态效果与药水系统
+
+### 效果分类
+
+模组新增 60 个状态效果（StatusEffect），分为三大类：
+
+#### 罪孽/物理分类效果（48 种）
+
+6 个分类 × (7 罪孽 + 1 物理) = 48 种：
+
+| 类别 | 关键词 | 效果 | 公式 |
+|------|--------|------|------|
+| 强化 | `strengthen` | 造成该类型伤害 +N% | `1 + 0.3 × (amplifier + 1)` |
+| 守护 | `guard` | 受到该类型伤害 -N% | `1 - 0.3 × (amplifier + 1)` |
+| 提升 | `boost` | 结算伤害 +N | `2 × (amplifier + 1)` |
+| 弱化 | `weaken` | 造成该类型伤害 -N% | `1 - 0.3 × (amplifier + 1)` |
+| 易损 | `vulnerable` | 受到该类型伤害 +N% | `1 + 0.3 × (amplifier + 1)` |
+| 降低 | `reduce` | 结算伤害 -N | `2 × (amplifier + 1)` |
+
+#### 通用效果（5 种）
+
+| 效果 | 关键词 | 说明 |
+|------|--------|------|
+| 碎片获取增加 | `fragment_boost` | 每次获取碎片 +N |
+| 无消耗 | `no_cost` | 触发罪孽不消耗碎片 |
+| 无视抗性 | `ignore_resistance` | N% 伤害无视物理/罪孽抗性 |
+| 碎片扣除 | `fragment_drain` | 每 5s 扣除 N 碎片 |
+| 消耗增加 | `cost_increase` | 触发罪孽消耗 +N% |
+
+#### 爆发效果（7 种 × 5 级）
+
+以"爆发的忧郁"为例：
+
+| 效果 | 公式 |
+|------|------|
+| 罪孽抗性 | +0.3 × N |
+| 物理抗性 | -0.5 × N |
+| 反伤 | 受到攻击时对攻击者造成 3 × N 点对应罪孽伤害 |
+| 伤害转换 | 所有受到的伤害改为对应罪孽属性 |
+
+### 酿造系统
+
+采用**两段式酿造**：
+
+```
+粗制药水 + 罪孽材料 → 罪孽基础药水 → + 分类材料 → 具体药水
+```
+
+| 罪孽 | 基础材料 | 分类材料 |
+|------|---------|---------|
+| 暴怒 | 烈焰棒 | 火焰弹(强化) / 铁锭(守护) / 海晶碎片(提升) / 毒马铃薯(弱化) / 线(易损) / 爆裂紫颂果(降低) |
+| 色欲 | 玫瑰丛 | 同上 |
+| 怠惰 | 羽毛 | 同上 |
+| 暴食 | 腐肉 | 同上 |
+| 忧郁 | 墨囊 | 同上 |
+| 傲慢 | 金锭 | 同上 |
+| 嫉妒 | 绿宝石 | 同上 |
+| 爆发 | — | 回响碎片（加入罪孽基础药水） |
+
+**升级与转换：**
+- 萤石粉 → 提升 1 级（罪孽/物理/通用最高 Lv3，爆发最高 Lv5）
+- 红石粉 → 延长时长（基础 3min → 延长 8min）
+- 火药 → 喷溅型药水
+- 龙息 → 滞留型药水
 
 ---
 
