@@ -163,6 +163,29 @@ public class SinFragmentData {
     }
 
     /**
+     * 获取所有罪孽类型的碎片总数。
+     */
+    public int getTotalFragments() {
+        int total = 0;
+        for (SinType type : SinType.values()) {
+            total += getFragments(type);
+        }
+        return total;
+    }
+
+    /**
+     * 获取所有罪孽类型的碎片数量数组（按 SinType 枚举顺序）。
+     */
+    public int[] getAllFragmentCounts() {
+        SinType[] types = SinType.values();
+        int[] counts = new int[types.length];
+        for (int i = 0; i < types.length; i++) {
+            counts[i] = getFragments(types[i]);
+        }
+        return counts;
+    }
+
+    /**
      * 序列化到 NBT。
      */
     public NbtCompound writeNbt(NbtCompound nbt) {

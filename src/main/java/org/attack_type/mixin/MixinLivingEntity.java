@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.math.Vec3d;
+import org.attack_type.advancement.ModAdvancements;
 import org.attack_type.api.AttackType;
 import org.attack_type.api.AttackTypeMapper;
 import org.attack_type.api.ResistanceProfile;
@@ -107,6 +108,9 @@ public abstract class MixinLivingEntity {
                 player.kill();
                 PENDING_SIN_DAMAGE.set(0.0f);
                 PENDING_PHYS_MULT.set(physResistance);
+                if (player instanceof ServerPlayerEntity sp) {
+                    ModAdvancements.grant(sp, ModAdvancements.INSTANT_KILL);
+                }
                 return;
             }
 
@@ -120,6 +124,10 @@ public abstract class MixinLivingEntity {
                     ServerWorld sw = (ServerWorld) self.getWorld();
                     spawnSinParticles(sw, self.getX(), self.getY() + self.getHeight() / 2, self.getZ(), sinType, sinLevel);
                     SinFragmentAcquisition.notifySinAttackWitnessed(self.getWorld(), self.getPos());
+
+                    if (attacker instanceof ServerPlayerEntity sp) {
+                        ModAdvancements.recordSinTrigger(sp, sinType);
+                    }
 
                     sw.playSound(null, self.getX(), self.getY(), self.getZ(),
                             SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE,

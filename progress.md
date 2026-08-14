@@ -273,3 +273,22 @@
 
 **修改文件：** MixinLivingEntity.java (新增 4 个 import, 修改 2 个方法, 新增 1 个方法)
 **构建结果：** BUILD SUCCESSFUL
+
+### 阶段38: 成就与进度系统（完成）
+- 38a: 自定义进度 — 7 个进度 JSON，使用 `minecraft:impossible` 触发器 + 代码手动授予
+  - `root` — 自动授予（tick 触发器）
+  - `first_sin` — 首次触发罪孽攻击
+  - `sin_master` — 触发全部 7 种罪孽（challenge 级别）
+  - `overflow` — 首次碎片溢出 ≥500（goal 级别）
+  - `instant_kill` — 首次即死 ≥1000（challenge 级别）
+  - `sin_addict` — 累计碎片 ≥1000（goal 级别）
+  - `sin_collector` — 全部 7 种碎片 ≥100（challenge 级别）
+- 38b: 进度奖励 — 经验值奖励 (50-500 XP)，通过 advancement JSON rewards 字段配置
+- 38c: 进度本地化 — zh_cn.json + en_us.json 完整翻译
+
+**新增文件：**
+- `ModAdvancements.java` — 进度管理工具类（授予/检查/记录触发类型）
+- `data/attack_type/advancements/*.json` — 7 个进度定义文件
+
+**修改文件：** MixinLivingEntity.java, SinFragmentManager.java, SinFragmentData.java, zh_cn.json, en_us.json
+**构建结果：** BUILD SUCCESSFUL

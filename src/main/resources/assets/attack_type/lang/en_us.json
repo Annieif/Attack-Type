@@ -81,5 +81,20 @@
   "cmd.attack_type.frag_set_ok": "Set %s fragments to %d for %s",
   "cmd.attack_type.total_product_decay": "Sin overwhelms! Total product decayed to %.1f",
   "cmd.attack_type.test_spawned": "Spawned %d test dogs",
-  "cmd.attack_type.test_dog_name": "Test Dog #%d"
+  "cmd.attack_type.test_dog_name": "Test Dog #%d",
+
+  "advancement.attack_type.root.title": "Attack Type",
+  "advancement.attack_type.root.description": "The power of sin has awakened",
+  "advancement.attack_type.first_sin.title": "First Sin",
+  "advancement.attack_type.first_sin.description": "Trigger a sin attack for the first time",
+  "advancement.attack_type.sin_master.title": "Sin Master",
+  "advancement.attack_type.sin_master.description": "Trigger all 7 types of sin attacks",
+  "advancement.attack_type.overflow.title": "Sin Overflows",
+  "advancement.attack_type.overflow.description": "Reach 500 fragments of any sin type, starting total product decay",
+  "advancement.attack_type.instant_kill.title": "Beyond Redemption",
+  "advancement.attack_type.instant_kill.description": "Reach 1000 fragments of any sin type, triggering instant death",
+  "advancement.attack_type.sin_addict.title": "Fragment Addict",
+  "advancement.attack_type.sin_addict.description": "Accumulate 1000 sin fragments in total",
+  "advancement.attack_type.sin_collector.title": "Fragment Collector",
+  "advancement.attack_type.sin_collector.description": "Have 100+ fragments of all 7 sin types"
 }

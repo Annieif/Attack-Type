@@ -73,5 +73,20 @@
   "cmd.attack_type.frag_set_ok": "已将 %s 的 %s 碎片设为 %d",
   "cmd.attack_type.total_product_decay": "罪孽深重！总积降至 %.1f",
   "cmd.attack_type.test_spawned": "已生成 %d 只测试狗",
-  "cmd.attack_type.test_dog_name": "测试狗 #%d"
+  "cmd.attack_type.test_dog_name": "测试狗 #%d",
+
+  "advancement.attack_type.root.title": "攻击类型",
+  "advancement.attack_type.root.description": "罪孽深重的力量已觉醒",
+  "advancement.attack_type.first_sin.title": "初次罪孽",
+  "advancement.attack_type.first_sin.description": "首次触发罪孽攻击",
+  "advancement.attack_type.sin_master.title": "罪孽大师",
+  "advancement.attack_type.sin_master.description": "触发全部 7 种罪孽攻击",
+  "advancement.attack_type.overflow.title": "罪孽深重",
+  "advancement.attack_type.overflow.description": "任意罪孽碎片首次达到 500，总积开始衰减",
+  "advancement.attack_type.instant_kill.title": "罪无可赦",
+  "advancement.attack_type.instant_kill.description": "任意罪孽碎片达到 1000，触发即死",
+  "advancement.attack_type.sin_addict.title": "碎片成瘾",
+  "advancement.attack_type.sin_addict.description": "累计获得 1000 个罪孽碎片",
+  "advancement.attack_type.sin_collector.title": "碎片收藏家",
+  "advancement.attack_type.sin_collector.description": "全部 7 种罪孽碎片均达到 100 个"
 }

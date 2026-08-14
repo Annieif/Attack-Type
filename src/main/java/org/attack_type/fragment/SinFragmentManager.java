@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import org.attack_type.advancement.ModAdvancements;
 import org.attack_type.api.ResistanceProfile;
 import org.attack_type.api.SinType;
 import org.attack_type.component.ResistanceManager;
@@ -181,11 +182,18 @@ public class SinFragmentManager {
                         ServerPlayerEntity sp = (ServerPlayerEntity) living;
                         ResistanceManager.syncToPlayer(sp);
                         sp.sendMessage(Text.translatable("cmd.attack_type.total_product_decay", String.format("%.1f", newProduct)), true);
+                        ModAdvancements.grant(sp, ModAdvancements.OVERFLOW);
                     }
                 }
             }
             if (newCount < ModConfig.OVERFLOW_THRESHOLD && data.hasThresholdReached(type)) {
                 data.clearThresholdReached(type);
+            }
+
+            if (player instanceof ServerPlayerEntity sp) {
+                int total = data.getTotalFragments();
+                ModAdvancements.checkSinAddict(sp, total);
+                ModAdvancements.checkSinCollector(sp, data.getAllFragmentCounts());
             }
         }
         markDirty(player.getUuid());
