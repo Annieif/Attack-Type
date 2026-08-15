@@ -124,14 +124,14 @@ Tracks the time interval between consecutive mob kills:
 | Breed any animal                                           | +1        |
 | Throw an egg                                               | +1        |
 | Cure a zombie villager                                     | +10       |
-| Lightning strike transforms Pig→Zombified Piglin / Creeper→Charged Creeper / Mooshroom→Brown/Red variant / Villager→Witch | +10       |
+| Lightning strike transforms Pig→Zombified Piglin / Creeper→Charged Creeper / Mooshroom→Brown/Red variant / Villager→Witch | +5        |
 | Zombie converts to Drowned in water                        | +5        |
 
 #### Sloth — Idleness & Sleep
 
 | Action                                    | Fragments |
 |-------------------------------------------|-----------|
-| Stand still (no running, no jumping) per minute | +1        |
+| Stand still (no running, no jumping) per minute | +3        |
 | Complete a full sleep cycle               | +5        |
 
 > QoL: Players can sleep at any time (even during daytime) and can sleep repeatedly.
@@ -163,19 +163,10 @@ Tracks the time interval between consecutive mob kills:
 
 | Action                                                    | Fragments |
 |-----------------------------------------------------------|-----------|
-| Nearby entity has better equipment than you (per minute)  | +2        |
+| Nearby entity has better equipment than you (per minute)  | +3        |
 | Witness any entity perform a sin-attribute attack (per attack) | +1        |
 
 > Equipment tiers: Netherite > Diamond > Gold > Iron > Stone > Wood > None. Enchanted > Unenchanted.
-
-### Base Fragment Gain
-
-| Event               | Amount |
-|---------------------|--------|
-| Take sin damage     | +1     |
-| Deal sin damage     | +1     |
-| Kill a mob          | +5     |
-| Kill a player       | +20    |
 
 ### Fragment Thresholds
 
@@ -523,22 +514,21 @@ Awkward Potion + Sin Material → Sin Base Potion → + Category Material → Sp
 
 ### Fragment Management Rules
 
-16. Take/deal sin damage +1; kill mob +5; kill player +20
-17. Manual trigger cost = max(1, baseCost - 2 × enchantLevel)
-18. Overflow threshold: 500; Kill threshold: 1000
-19. Player disconnect auto-cleans fragment data
-20. Any sin fragment first reaching 500 reduces totalProduct by 0.1 (minimum 0.1)
+16. Manual trigger cost = max(1, baseCost - 2 × enchantLevel)
+17. Overflow threshold: 500; Kill threshold: 1000
+18. Player disconnect auto-cleans fragment data
+19. Any sin fragment first reaching 500 reduces totalProduct by 0.1 (minimum 0.1)
 
 ### Enchantment Rules
 
-21. Sin enchantments: RARE / 5 levels / mainhand / any item
-22. Physical resistance enchantments: RARE / 4 levels / 4 armor slots / -5% damage per level
+20. Sin enchantments: RARE / 5 levels / mainhand / any item
+21. Physical resistance enchantments: RARE / 4 levels / 4 armor slots / -5% damage per level
 
 ### Network Rules
 
-23. Resistance changes must be normalized server-side before syncing to client
-24. Fragment triggers are validated server-side; client only sends requests
-25. Auto-sync resistance + fragment data on player join
+22. Resistance changes must be normalized server-side before syncing back to client
+23. Fragment triggers are validated server-side; client only sends requests
+24. Auto-sync resistance + fragment data on player join
 
 ---
 

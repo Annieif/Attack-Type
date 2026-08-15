@@ -316,3 +316,30 @@
 
 **修改文件：** MixinLivingEntity.java, SinFragmentManager.java, SinFragmentData.java, zh_cn.json, en_us.json
 **构建结果：** BUILD SUCCESSFUL
+
+## 会话 8: 2026-08-14
+
+### 代码与文档一致性审计
+
+**发现问题：**
+
+| # | 位置 | 问题 | 修复 |
+|---|------|------|------|
+| 1 | README/README_EN "基础碎片获取" | 整节不存在于代码中（受罪孽+1/造成罪孽+1/击杀+5/+20） | 删除该节 + 规则16 |
+| 2 | README/README_EN 忧郁 | "每 1 点伤害" → 实际代码每 10 点伤害 (GLOOM_DAMAGE_PER_FRAGMENT=10) | 修正为 "每 10 点伤害" |
+| 3 | README/README_EN 色欲闪电 | "+10" → 实际代码 LUST_LIGHTNING_AMOUNT=5 | 修正为 "+5" |
+| 4 | README/README_EN 怠惰AFK | "+1" → 实际代码 SLOTH_AFK_AMOUNT=3 | 修正为 "+3" |
+| 5 | README/README_EN 傲慢制作 | "27组(1728)" → 实际代码 PRIDE_CRAFT_THRESHOLD=576 | 修正为 "9组(576)" |
+| 6 | README/README_EN 嫉妒攀比 | "+2" → 实际代码 ENVY_COMPARE_AMOUNT=3 | 修正为 "+3" |
+| 7 | task_plan | 缺少生物/护甲暂留阶段 | 添加阶段43(生物系统) + 阶段44(护甲系统) |
+
+**验证通过项：**
+- 碎片消耗 40/70/100 — 代码与 README 一致 ✓
+- 伤害公式 sinDamage = (sinLevel × 3 + 1) × sinResistance — 代码与 README 一致 ✓
+- 溢出/即死阈值 500/1000 — 一致 ✓
+- 激活持续 80/140/200 ticks — 一致 ✓
+- 暴怒连杀 7/5/3/1 — 一致 ✓
+- 色欲繁殖/鸡蛋/治愈/溺尸 — 一致 ✓
+- 暴食进食 +1 — 一致 ✓
+- 傲慢成就 +10/生产 +2 — 一致 ✓
+- 嫉妒目击 +1 — 一致 ✓
